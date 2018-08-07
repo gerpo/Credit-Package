@@ -1,7 +1,7 @@
 {
   "name": "gerpo/dms-credit-package",
   "description": "Plugin for DMS to provide users with a credit system",
-  "type": "metapackage",
+  "type": "package",
   "license": "MIT",
   "authors": [
     {
@@ -29,7 +29,7 @@
   "extra": {
     "laravel": {
       "providers": [
-        "Gerpo\\Dms-Credit-Package\\CreditServiceProvider"
+        "Gerpo\\DmsCredits\\CreditServiceProvider"
       ]
     },
     "plugisto": {
