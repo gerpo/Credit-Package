@@ -1,0 +1,41 @@
+{
+  "name": "gerpo/dms-credit-package",
+  "description": "Plugin for DMS to provide users with a credit system",
+  "type": "metapackage",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Adam Marciniak",
+      "email": "adamarc@web.de"
+    }
+  ],
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "D:\\Web-Projekte\\plugisto\\packages\\gerpo\\plugisto"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "Gerpo\\DmsCredits\\": "src"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "DmsCredits\\Tests\\": "tests/"
+    }
+  },
+  "require": {},
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Gerpo\\Dms-Credit-Package\\CreditServiceProvider"
+      ]
+    },
+    "plugisto": {
+      "name": "Credit-Package",
+      "description": "Credit system",
+      "route": "/credits"
+    }
+  }
+}
