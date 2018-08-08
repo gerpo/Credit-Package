@@ -25,7 +25,9 @@
       "DmsCredits\\Tests\\": "tests/"
     }
   },
-  "require": {},
+  "require": {
+    "spatie/laravel-event-projector": "^1.0"
+  },
   "extra": {
     "laravel": {
       "providers": [
