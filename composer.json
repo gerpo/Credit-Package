@@ -3,6 +3,7 @@
   "description": "Plugin for DMS to provide users with a credit system",
   "type": "package",
   "license": "MIT",
+  "minimum-stability": "dev",
   "authors": [
     {
       "name": "Adam Marciniak",
@@ -17,16 +18,20 @@
   ],
   "autoload": {
     "psr-4": {
-      "Gerpo\\DmsCredits\\": "src"
+      "Gerpo\\DmsCredits\\": "./src"
     }
   },
   "autoload-dev": {
     "psr-4": {
-      "DmsCredits\\Tests\\": "tests/"
+      "DmsCredits\\Tests\\": "tests"
     }
   },
   "require": {
     "spatie/laravel-event-projector": "^1.0"
+  },
+  "require-dev":{
+    "phpunit/phpunit": "^7.3",
+    "orchestra/testbench": "^3.6"
   },
   "extra": {
     "laravel": {
