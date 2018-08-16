@@ -1,14 +1,14 @@
 <?php
 
-namespace Gerpo\DmsCredits\Test;
+namespace DmsCredits\Tests;
 
 use Gerpo\DmsCredits\CreditServiceProvider;
-use HasCreditAccount;
+use Gerpo\DmsCredits\Traits\HasCreditAccount;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Schema;
-use Orchestra\Testbench\TestCase as Orchestra;
+use Spatie\EventProjector\EventProjectorServiceProvider;
 
-class TestCase extends Orchestra
+class TestCase extends \Orchestra\Testbench\TestCase
 {
     /**
      * Get package providers.
@@ -20,6 +20,7 @@ class TestCase extends Orchestra
     protected function getPackageProviders($app): array
     {
         return [
+            EventProjectorServiceProvider::class,
             CreditServiceProvider::class,
         ];
     }
@@ -36,9 +37,13 @@ class TestCase extends Orchestra
         $app['config']->set('app.key', '6rE9Nz59bGRbeMATftriyQjrpF7DcOQm');
     }
 
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
+        $this->removeOldMigrations();
+
+        $this->artisan('vendor:publish',
+            ['--provider' => 'Spatie\EventProjector\EventProjectorServiceProvider',]);
 
         $this->migrate();
     }
@@ -52,6 +57,22 @@ class TestCase extends Orchestra
             $table->string('name')->nullable();
             $table->timestamps();
         });
+    }
+
+    protected function tearDown()
+    {
+        $this->removeOldMigrations();
+    }
+
+    private function removeOldMigrations(): void
+    {
+        $files = glob(realpath(__DIR__ . '/../vendor/orchestra/testbench-core/laravel/database/migrations').'/*.php');
+
+        foreach ($files as $file) {
+            if (is_file($file)) {
+                unlink($file);
+            }
+        }
     }
 }
 

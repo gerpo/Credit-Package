@@ -18,7 +18,6 @@ class AccountProjector implements Projector
      */
     protected $handlesEvents = [
         AccountCreated::class => 'onAccountCreated',
-        AccountDisabled::class => 'onAccountDeleted',
         AccountEnabled::class => 'onAccountEnabled',
         AccountDisabled::class => 'onAccountDisabled',
     ];
@@ -29,5 +28,27 @@ class AccountProjector implements Projector
     public function onAccountCreated(AccountCreated $event): void
     {
         CreditAccount::create($event->accountAttributes);
+    }
+
+    public function onAccountEnabled(AccountEnabled $event): void
+    {
+        $account = CreditAccount::uuid($event->accountUuid);
+        if ($account === null) {
+            return;
+        }
+
+        $account->is_active = true;
+        $account->save();
+    }
+
+    public function onAccountDisabled(AccountDisabled $event): void
+    {
+        $account = CreditAccount::uuid($event->accountUuid);
+        if ($account === null) {
+            return;
+        }
+
+        $account->is_active = false;
+        $account->save();
     }
 }

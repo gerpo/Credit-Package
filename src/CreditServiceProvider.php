@@ -14,10 +14,13 @@ class CreditServiceProvider extends ServiceProvider
     public function boot(Projectionist $projectionist): void
     {
         $this->publishes([
-            __DIR__ . '/config/DmsCredits.php.php' => config_path('DmsCredits.php'),
+            __DIR__ . '/config/DmsCredits.php' => config_path('DmsCredits.php'),
         ], 'config');
 
         $this->exportMigrations();
+
+        $this->loadViewsFrom(__DIR__.'/views', 'DmsCredits');
+        $this->loadRoutesFrom(__DIR__.'/Routes/routes.php');
 
         $this->registerProjectors($projectionist);
     }
@@ -37,5 +40,8 @@ class CreditServiceProvider extends ServiceProvider
 
     public function register(): void
     {
+        $this->mergeConfigFrom(
+            __DIR__.'/config/DmsCredits.php', 'DmsCredit'
+        );
     }
 }

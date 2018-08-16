@@ -2,7 +2,6 @@
 
 namespace Gerpo\DmsCredits\Projectors;
 
-use Gerpo\DmsCredits\Events\AccountCreated;
 use Gerpo\DmsCredits\Events\CreditsAdded;
 use Gerpo\DmsCredits\Events\CreditsSubtracted;
 use Gerpo\DmsCredits\Exceptions\InsufficientCreditsException;
@@ -20,36 +19,35 @@ class AccountBalanceProjector implements Projector
     ];
 
     /**
-     * @param AccountCreated $event
-     */
-    public function onAccountCreated(AccountCreated $event): void
-    {
-        CreditAccount::create($event->accountAttributes);
-    }
-
-    /**
      * @param CreditsAdded $event
      */
     public function onCreditsAdded(CreditsAdded $event): void
     {
-        $account = CreditAccount::find($event->accountId);
+        $account = CreditAccount::uuid($event->accountUuid);
+
+        if ($account === null) {
+            return;
+        }
 
         $account->balance += $event->amount;
-
         $account->save();
     }
 
     /**
-     * @param CreditsAdded $event
+     * @param CreditsSubtracted $event
      * @throws InsufficientCreditsException
      */
-    public function onCreditsSubtracted(CreditsAdded $event): void
+    public function onCreditsSubtracted(CreditsSubtracted $event): void
     {
-        $account = CreditAccount::find($event->accountId);
+        $account = CreditAccount::uuid($event->accountUuid);
+
+        if ($account === null) {
+            return;
+        }
 
         $account->balance -= $event->amount;
 
-        if ($account->balance < config('dmscredit.minimum-balance')) {
+        if ($account->balance < config('DmsCredit.minimum_balance')) {
             throw InsufficientCreditsException::subtraction($account, $event->amount);
         }
 

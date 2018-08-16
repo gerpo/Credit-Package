@@ -13,9 +13,11 @@ class CreateCreditAccountTable extends Migration
      */
     public function up()
     {
-        Schema::create('credit_account', function (Blueprint $table) {
+        Schema::create('credit_accounts', function (Blueprint $table) {
             $table->increments('id');
+            $table->string('uuid');
             $table->integer('balance')->default(0);
+            $table->boolean('is_active')->default(true);
             $table->morphs('owner');
             $table->timestamps();
         });
