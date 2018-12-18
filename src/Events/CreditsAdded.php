@@ -14,9 +14,13 @@ class CreditsAdded implements ShouldBeStored
     /** @var int */
     public $amount;
 
-    public function __construct(string $accountUuid, int $amount)
+    /** @var string */
+    public $message;
+
+    public function __construct(string $accountUuid, int $amount, string $message = null)
     {
         $this->accountUuid = $accountUuid;
         $this->amount = $amount;
+        $this->message = $message;
     }
 }

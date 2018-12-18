@@ -35,7 +35,6 @@ class AccountBalanceProjector implements Projector
 
     /**
      * @param CreditsSubtracted $event
-     * @throws InsufficientCreditsException
      */
     public function onCreditsSubtracted(CreditsSubtracted $event): void
     {
@@ -46,11 +45,6 @@ class AccountBalanceProjector implements Projector
         }
 
         $account->balance -= $event->amount;
-
-        if ($account->balance < config('DmsCredit.minimum_balance')) {
-            throw InsufficientCreditsException::subtraction($account, $event->amount);
-        }
-
         $account->save();
     }
 }

@@ -4,8 +4,10 @@ namespace DmsCredits\Tests;
 
 use Gerpo\DmsCredits\CreditServiceProvider;
 use Gerpo\DmsCredits\Traits\HasCreditAccount;
-use Illuminate\Database\Eloquent\Model;
+use Gerpo\DmsCredits\Traits\UsesCodes;
 use Illuminate\Support\Facades\Schema;
+use Silber\Bouncer\BouncerServiceProvider;
+use Silber\Bouncer\Database\HasRolesAndAbilities;
 use Spatie\EventProjector\EventProjectorServiceProvider;
 
 class TestCase extends \Orchestra\Testbench\TestCase
@@ -22,6 +24,7 @@ class TestCase extends \Orchestra\Testbench\TestCase
         return [
             EventProjectorServiceProvider::class,
             CreditServiceProvider::class,
+            BouncerServiceProvider::class,
         ];
     }
 
@@ -37,6 +40,17 @@ class TestCase extends \Orchestra\Testbench\TestCase
         $app['config']->set('app.key', '6rE9Nz59bGRbeMATftriyQjrpF7DcOQm');
     }
 
+    /**
+     * Resolve application HTTP Kernel implementation.
+     *
+     * @param  \Illuminate\Foundation\Application  $app
+     * @return void
+     */
+    protected function resolveApplicationHttpKernel($app)
+    {
+        $app->singleton('Illuminate\Contracts\Http\Kernel', \DmsCredits\Tests\TestHttpKernel::class);
+    }
+
     protected function setUp()
     {
         parent::setUp();
@@ -45,7 +59,21 @@ class TestCase extends \Orchestra\Testbench\TestCase
         $this->artisan('vendor:publish',
             ['--provider' => 'Spatie\EventProjector\EventProjectorServiceProvider',]);
 
+        $this->artisan('vendor:publish',
+            ['--provider' => BouncerServiceProvider::class,]);
+
         $this->migrate();
+    }
+
+    private function removeOldMigrations(): void
+    {
+        $files = glob(realpath(__DIR__ . '/../vendor/orchestra/testbench-core/laravel/database/migrations') . '/*.php');
+
+        foreach ($files as $file) {
+            if (is_file($file)) {
+                unlink($file);
+            }
+        }
     }
 
     private function migrate()
@@ -64,21 +92,34 @@ class TestCase extends \Orchestra\Testbench\TestCase
         $this->removeOldMigrations();
     }
 
-    private function removeOldMigrations(): void
+    protected function signIn($user = null, $ability = null)
     {
-        $files = glob(realpath(__DIR__ . '/../vendor/orchestra/testbench-core/laravel/database/migrations').'/*.php');
+        $user = $user ?: createUser();
 
-        foreach ($files as $file) {
-            if (is_file($file)) {
-                unlink($file);
-            }
-        }
+        $user->allow($ability);
+
+        $this->actingAs($user);
+
+        return $this;
+    }
+
+    protected function signInAdmin($admin = null)
+    {
+        $admin = $admin ?: createUser();
+
+        $admin->assign('admin');
+
+        $this->actingAs($admin);
+
+        return $this;
     }
 }
 
-class User extends Model
+class User extends \Illuminate\Foundation\Auth\User
 {
     use HasCreditAccount;
+    use UsesCodes;
+    use HasRolesAndAbilities;
     protected $table = 'users';
     protected $guarded = [];
 }

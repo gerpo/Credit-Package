@@ -4,8 +4,7 @@ namespace DmsCredits\Tests;
 
 use Gerpo\DmsCredits\Events\CreditsAdded;
 use Gerpo\DmsCredits\Events\CreditsSubtracted;
-use Gerpo\DmsCredits\Exceptions\InsufficientCreditsException;
-use Gerpo\DmsCredits\Models\CreditAccount;
+use Spatie\EventProjector\Models\StoredEvent;
 
 class AccountBalanceProjectorTest extends TestCase
 {
@@ -36,15 +35,28 @@ class AccountBalanceProjectorTest extends TestCase
     }
 
     /** @test */
-    public function CreditsSubtracted_throws_exception_if_balance_is_insufficient(): void
+    public function CreditsAdded_sets_correct_message(): void
     {
         $account = createAccount();
+        $message = 'This is a generic test message.';
 
-        $this->assertEquals(0, $account->balance);
-        $this->expectException(InsufficientCreditsException::class);
+        event(new CreditsAdded($account->uuid, 200, $message));
 
-        event(new CreditsSubtracted($account->uuid, 200));
+        $event = StoredEvent::where('event_class', CreditsAdded::class)->first();
 
-        $this->assertEquals(0, $account->fresh()->balance);
+        $this->assertEquals($message, $event->event_properties['message']);
+    }
+
+    /** @test */
+    public function CreditsSubtracted_sets_correct_message(): void
+    {
+        $account = createAccount();
+        $message = 'This is a generic test message.';
+
+        event(new CreditsSubtracted($account->uuid, 200, $message));
+
+        $event = StoredEvent::where('event_class', CreditsSubtracted::class)->first();
+
+        $this->assertEquals($message, $event->event_properties['message']);
     }
 }

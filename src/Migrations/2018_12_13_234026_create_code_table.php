@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateCreditAccountTable extends Migration
+class CreateCodeTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +13,13 @@ class CreateCreditAccountTable extends Migration
      */
     public function up()
     {
-        Schema::create('credit_accounts', function (Blueprint $table) {
+        Schema::create('codes', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('uuid');
-            $table->integer('balance')->default(0);
-            $table->boolean('is_active')->default(true);
-            $table->morphs('owner');
+            $table->uuid('code')->unique();
+            $table->unsignedInteger('value');
+            $table->unsignedInteger('created_by');
+            $table->unsignedInteger('used_by')->nullable();
+            $table->timestamp('used_at')->nullable();
             $table->timestamps();
         });
     }
@@ -30,6 +31,6 @@ class CreateCreditAccountTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('credit_accounts');
+        Schema::dropIfExists('code');
     }
 }

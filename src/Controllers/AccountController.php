@@ -9,6 +9,7 @@ class AccountController extends Controller
 {
     public function index()
     {
-        return view('DmsCredits.credits');
+        $account = auth()->user()->creditAccount->append('transactions');
+        return view('DmsCredits::credits')->with('account', $account);
     }
 }

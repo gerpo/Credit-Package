@@ -9,13 +9,21 @@ use Gerpo\DmsCredits\Events\AccountDisabled;
 use Gerpo\DmsCredits\Events\AccountEnabled;
 use Gerpo\DmsCredits\Events\CreditsAdded;
 use Gerpo\DmsCredits\Events\CreditsSubtracted;
+use Gerpo\DmsCredits\Exceptions\InsufficientCreditsException;
+use Gerpo\DmsCredits\Resources\Transaction;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Ramsey\Uuid\Uuid;
+use Spatie\EventProjector\Models\StoredEvent;
 
 class CreditAccount extends Model
 {
     protected $guarded = [];
+    protected $hidden = [
+        'id',
+        'owner_id',
+        'owner_type'
+    ];
     protected $casts = [
         'is_active' => 'boolean',
     ];
@@ -34,13 +42,22 @@ class CreditAccount extends Model
         return static::where('uuid', $uuid)->first();
     }
 
-    public function addCredits(int $amount): void
+    public function addCredits(int $amount, string $message = null): void
     {
-        event(new CreditsAdded($this->uuid, $amount));
+        event(new CreditsAdded($this->uuid, $amount, $message));
     }
 
+    /**
+     * @param string $amount
+     * @throws InsufficientCreditsException
+     */
     public function subtractCredits(string $amount): void
     {
+
+        if ($this->balance - $amount < config('DmsCredit.minimum_balance')) {
+            throw InsufficientCreditsException::subtraction($this, $amount);
+        }
+
         event(new CreditsSubtracted($this->uuid, $amount));
     }
 
@@ -57,5 +74,12 @@ class CreditAccount extends Model
     public function owner(): MorphTo
     {
         return $this->morphTo();
+    }
+
+    public function getTransactionsAttribute()
+    {
+        return Transaction::collection(StoredEvent::where('event_properties->accountAttributes->uuid',
+            $this->uuid)->orWhere('event_properties->uuid', $this->accountUuid)->get());
+        //return StoredEvent::where('event_properties->accountAttributes->uuid', $this->uuid)->get();
     }
 }
