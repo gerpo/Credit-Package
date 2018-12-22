@@ -4,9 +4,28 @@
 use DmsCredits\Tests\TestCase;
 use Gerpo\DmsCredits\Events\CreditsAdded;
 use Gerpo\DmsCredits\Jobs\GenerateCode;
+use Illuminate\Support\Arr;
 
 class CodeControllerTest extends TestCase
 {
+    /** @test */
+    public function index_returns_all_active_codes_of_user(): void
+    {
+        $user = createUser();
+        $user2 = createUser();
+        $code = createCode(500, $user);
+        $code2 = createCode(500, $user);
+
+        createCode(500, $user2);
+
+        $user2->redeemCode($code2);
+
+        $this->signInAdmin($user)
+            ->get(route('credits.code.index'))
+            ->assertSuccessful()
+            ->assertExactJson([$code->fresh()->toArray()]);
+    }
+
     /** @test */
     public function code_is_successfully_created(): void
     {

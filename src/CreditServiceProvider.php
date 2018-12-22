@@ -29,6 +29,12 @@ class CreditServiceProvider extends ServiceProvider
     public function exportMigrations(): void
     {
         $this->loadMigrationsFrom(__DIR__ . '/Migrations');
+
+        $this->publishes([
+            __DIR__ . '/Seeder' =>
+                database_path('seeds'
+                )
+        ], 'dms-credits.seeder');
     }
 
     public function exportResources(): void
@@ -37,10 +43,16 @@ class CreditServiceProvider extends ServiceProvider
         $this->loadTranslationsFrom(__DIR__.'/Resources/Lang', 'DmsCredits');
 
         $this->publishes([
+            __DIR__ . '/Resources/Lang' =>
+                resource_path('lang/vendor/DmsCredits'
+                )
+        ], 'dms-credits.translations');
+
+        $this->publishes([
             __DIR__ . '/Resources/Vue-Components' =>
                 resource_path('assets/js/gerpo/DmsCredits'
                 )
-        ], 'vue-components');
+        ], 'dms-credits.vue-components');
 
     }
 

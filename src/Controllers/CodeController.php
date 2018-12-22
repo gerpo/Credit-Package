@@ -4,6 +4,7 @@
 namespace Gerpo\DmsCredits\Controllers;
 
 
+use PDF;
 use Gerpo\DmsCredits\Jobs\GenerateCode;
 use Gerpo\DmsCredits\Models\Code;
 use Gerpo\DmsCredits\Rules\CodeExists;
@@ -12,6 +13,20 @@ use Illuminate\Routing\Controller;
 
 class CodeController extends Controller
 {
+    public function index()
+    {
+        return request()->user()->createdCodes()->active()->get();
+    }
+
+    public function export()
+    {
+        $codes = request()->user()->createdCodes()->active()->get();
+        //return view('DmsCredits::codesPdfTemplate')->with(['codes' => $codes]);
+        return PDF::loadView('DmsCredits::codesPdfTemplate', ['codes' => $codes])
+            ->setPaper('a4', 'portrait')
+            ->stream();
+    }
+
     public function create(Request $request)
     {
         $data = $request->validate([

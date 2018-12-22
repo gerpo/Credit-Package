@@ -10,6 +10,11 @@ class AccountController extends Controller
     public function index()
     {
         $account = auth()->user()->creditAccount->append('transactions');
+
+        if (request()->wantsJson()) {
+            return $account;
+        }
+
         return view('DmsCredits::credits')->with('account', $account);
     }
 }

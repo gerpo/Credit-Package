@@ -48,8 +48,9 @@ class CodeGenerator
      * @return String
      * @throws \Exception
      */
-    public function generateUniqueCode(int $length = 8): String
+    public function generateUniqueCode(int $length = null): String
     {
+        $length = $length ?? config('DmsCredit.code_length', 8);
         $chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
         $nChars = strlen($chars) - 1;
         $res = str_repeat(0, $length);
