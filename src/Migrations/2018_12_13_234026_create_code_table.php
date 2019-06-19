@@ -19,6 +19,7 @@ class CreateCodeTable extends Migration
             $table->unsignedInteger('value');
             $table->unsignedInteger('created_by');
             $table->unsignedInteger('used_by')->nullable();
+            $table->boolean('exported')->default(false);
             $table->timestamp('used_at')->nullable();
             $table->timestamps();
         });

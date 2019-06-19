@@ -51,13 +51,13 @@ class TestCase extends \Orchestra\Testbench\TestCase
         $app->singleton('Illuminate\Contracts\Http\Kernel', \DmsCredits\Tests\TestHttpKernel::class);
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->removeOldMigrations();
 
         $this->artisan('vendor:publish',
-            ['--provider' => 'Spatie\EventProjector\EventProjectorServiceProvider',]);
+            ['--provider' => EventProjectorServiceProvider::class,]);
 
         $this->artisan('vendor:publish',
             ['--provider' => BouncerServiceProvider::class,]);
@@ -87,7 +87,7 @@ class TestCase extends \Orchestra\Testbench\TestCase
         });
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->removeOldMigrations();
     }

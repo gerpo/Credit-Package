@@ -4,16 +4,22 @@
             <div class="card-header text-capitalize">
                 <span>{{ 'Credits' }}</span>
             </div>
-            <div class="card-body d-flex flex-wrap align-items-end justify-content-between">
-                <div class="balance-wrapper text-center rounded p-3">
-                    <p>Your current Balance</p>
-                    <div class="balance">{{ this.account.balance }}</div>
+            <div class="card-body">
+                <nav class="nav nav-tabs nav-fill">
+                    <a class="nav-item nav-link active" data-toggle="tab" href="#nav-account">
+                        Personal
+                    </a>
+                    <a class="nav-item nav-link" v-if="$can('create_codes')" data-toggle="tab"
+                       href="#nav-codes">Codes
+                    </a>
+                </nav>
+                <div class="tab-content pt-2" id="nav-tabContent">
+                    <div id="nav-account" class="tab-pane fade show active"
+                         role="tabpanel">
+                        <account :account="account"/>
+                    </div>
+                    <codes id="nav-codes" class="tab-pane fade show" role="tabpanel"/>
                 </div>
-                <purchase-component/>
-
-                <hr class="w-100">
-
-                <account-transactions :transactions="account.transactions" class="w-100"/>
             </div>
         </div>
     </div>
@@ -21,14 +27,15 @@
 
 <script>
     import PurchaseComponent from './PurchaseComponent.vue';
-    import AccountTransactions from './AccountTransactionsComponent.vue';
-
+    import Account from './AccountComponent.vue';
+    import Codes from './CodesComponent.vue';
 
     export default {
         name: "credits-component",
         components: {
             PurchaseComponent,
-            AccountTransactions
+            Account,
+            Codes,
         },
         props: {
             account: {
@@ -36,18 +43,21 @@
                 }, type: [Object]
             }
         },
-        data: () => ({}),
+        mounted() {
+            const url = window.location.toString();
+            if (url.match('#')) {
+                $('.nav-tabs a[href="#' + url.split('#')[1] + '"]').tab('show');
+            }
+
+            $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+                window.location.hash =  e.target.hash;
+            })
+        }
     }
 </script>
 
 <style scoped>
-    .balance-wrapper{
-        border: 2px solid gray;
-        background-color: hsla(211, 100%, 35%, 0.1);
+    .nav-item.nav-link {
+        cursor: pointer;
     }
-
-    .balance {
-        font-size: 2.5rem;
-        line-height: 1.3rem;
-    }
-</style>s
+</style>

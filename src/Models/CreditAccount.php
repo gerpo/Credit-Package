@@ -80,6 +80,5 @@ class CreditAccount extends Model
     {
         return Transaction::collection(StoredEvent::where('event_properties->accountAttributes->uuid',
             $this->uuid)->orWhere('event_properties->uuid', $this->accountUuid)->get());
-        //return StoredEvent::where('event_properties->accountAttributes->uuid', $this->uuid)->get();
     }
 }

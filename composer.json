@@ -14,7 +14,7 @@
   "repositories": [
     {
       "type": "vcs",
-      "url": "D:\\Web-Projekte\\plugisto\\packages\\gerpo\\plugisto"
+      "url": "D:\\Web-Projekte\\Plugisto"
     }
   ],
   "autoload": {
@@ -31,11 +31,11 @@
     ]
   },
   "require": {
-    "spatie/laravel-event-projector": "^1.0",
+    "spatie/laravel-event-projector": "^2.0",
     "ramsey/uuid": "^3.8"
   },
   "require-dev": {
-    "phpunit/phpunit": "^7.3",
+    "phpunit/phpunit": "^8.0",
     "orchestra/testbench": "^3.6"
   },
   "extra": {

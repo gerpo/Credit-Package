@@ -1,28 +1,33 @@
 <template>
     <div class="purchase-wrapper">
-        <button class="btn btn-primary" @click="showPurchaseModal = true">Purchase Credits</button>
+        <button class="btn btn-primary text-capitalize" @click="showPurchaseModal = true">
+            {{ $tv('DmsCredits::account.add_credits_btn') }}
+        </button>
         <modal-component :show="showPurchaseModal" @close="showPurchaseModal = false">
-            <code-purchase-component />
-            <p class="h3 my-4 text-center italic text-secondary">or</p>
-            <stripe-purchase-component />
+            <code-purchase-component v-on:success="purchaseMade"/>
         </modal-component>
     </div>
 </template>
 
 <script>
-    import ModalComponent from "../../components/ModalComponent";
+    import ModalComponent from "@/components/ModalComponent";
     import CodePurchaseComponent from "./CodePurchaseComponent";
-    import StripePurchaseComponent from "./StripePurchaseComponent";
 
     export default {
         name: "purchase-component",
         components: {
-            StripePurchaseComponent,
             CodePurchaseComponent,
-            ModalComponent},
+            ModalComponent
+        },
         data: () => ({
             showPurchaseModal: false
-        })
+        }),
+        methods: {
+            purchaseMade() {
+                this.$emit('purchase-success');
+                this.showPurchaseModal = false;
+            }
+        }
     }
 </script>
 
