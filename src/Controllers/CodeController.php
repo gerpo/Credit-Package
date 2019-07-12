@@ -4,12 +4,12 @@
 namespace Gerpo\DmsCredits\Controllers;
 
 
-use PDF;
 use Gerpo\DmsCredits\Jobs\GenerateCode;
 use Gerpo\DmsCredits\Models\Code;
 use Gerpo\DmsCredits\Rules\CodeExists;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use PDF;
 
 class CodeController extends Controller
 {
@@ -20,8 +20,12 @@ class CodeController extends Controller
 
     public function export()
     {
-        $codes = request()->user()->createdCodes()->active()->get();
-        //return view('DmsCredits::codesPdfTemplate')->with(['codes' => $codes]);
+        $codes = request()->user()->createdCodes()->notExported()->get();
+
+        $codes->each(function ($code) {
+            $code->export();
+        });
+
         return PDF::loadView('DmsCredits::codesPdfTemplate', ['codes' => $codes])
             ->setPaper('a4', 'portrait')
             ->stream();

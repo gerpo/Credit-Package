@@ -29,6 +29,7 @@
                 return await axios.post(route('credits.code.create'), this.codes)
                     .then(response => {
                         this.reset();
+                        this.$emit('close');
                         this.flash('Credits will be generated. That can take some minutes.', 'success')
                     })
                     .catch(error => {

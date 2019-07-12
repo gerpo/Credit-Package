@@ -1,6 +1,6 @@
 <template>
     <div class="codes-created">
-        <table-component :data="codes" :loading="isLoading" :searchable="false">
+        <table-component :data="codes" :loading="isLoading" :searchable="false" sort-by="created_at" sort-order="desc">
             <template #columns>
                 <th v-if="copyPossible"></th>
                 <th>Code</th>
@@ -15,9 +15,9 @@
                         </svg>
                     </button>
                 </td>
-                <td :id="`code_${index}`" class="w-100">{{ row.code }}</td>
-                <td>{{ row.value | number }}</td>
-                <td>{{ row.created_at | moment('calendar') }}</td>
+                <td :class="{'text-muted': row.exported}" :id="`code_${index}`" class="w-100">{{ row.code }}</td>
+                <td :class="{'text-muted': row.exported}">{{ row.value | number }}</td>
+                <td :class="{'text-muted': row.exported}">{{ row.created_at | moment('calendar') }}</td>
             </template>
         </table-component>
     </div>

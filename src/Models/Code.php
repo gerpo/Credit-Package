@@ -37,8 +37,19 @@ class Code extends Model
         return $this->belongsTo(User::class, 'used_by');
     }
 
+    public function export(): void
+    {
+        $this->exported = true;
+        $this->save();
+    }
+
     public function scopeActive($query)
     {
         return $query->where('used_by', null);
+    }
+
+    public function scopeNotExported($query)
+    {
+        return $query->where('used_by', null)->where('exported', false);
     }
 }

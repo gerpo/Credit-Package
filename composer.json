@@ -47,7 +47,8 @@
     "plugisto": {
       "name": "Credits",
       "description": "Credit system",
-      "route": "/credits"
+      "route": "/credits",
+      "needed_permission": "have_credits"
     }
   }
 }
