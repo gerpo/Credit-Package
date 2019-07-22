@@ -8,6 +8,7 @@ use Gerpo\DmsCredits\Events\AccountDisabled;
 use Gerpo\DmsCredits\Events\AccountEnabled;
 use Gerpo\DmsCredits\Events\CreditsAdded;
 use Gerpo\DmsCredits\Events\CreditsSubtracted;
+use Gerpo\DmsCredits\Events\CreditsTransferred;
 use Gerpo\DmsCredits\Exceptions\InsufficientCreditsException;
 use Illuminate\Support\Facades\Event;
 
@@ -84,5 +85,40 @@ class CreditAccountTest extends TestCase
                 return $event->accountUuid === $account->uuid;
             });
         });
+    }
+
+    /** @test */
+    public function transferCredits_dispatches_correct_CreditsTransferred_Event(): void
+    {
+        $account = createAccount(['balance' => 200]);
+        $target = createAccount();
+
+        Event::fakeFor(function () use ($account, $target) {
+            $account->transferCredits($target->uuid, 200);
+
+            Event::assertDispatched(CreditsTransferred::class, function ($event) use ($account, $target) {
+                return $event->sourceUuid === $account->uuid &&
+                    $event->targetUuid === $target->uuid &&
+                    $event->amount === 200;
+            });
+        });
+    }
+
+    /** @test */
+    public function transferCredits_throws_exception_if_balance_is_insufficient(): void
+    {
+        $account = createAccount(['balance' => 0]);
+        $target = createAccount();
+
+        $this->expectException(InsufficientCreditsException::class);
+
+        Event::fakeFor(function () use ($account, $target) {
+            $account->transferCredits($target->uuid, 200);
+
+            Event::assertNotDispatched(CreditsTransferred::class);
+        });
+
+        $this->assertEquals(0, $account->fresh()->balance);
+        $this->assertEquals(0, $target->fresh()->balance);
     }
 }

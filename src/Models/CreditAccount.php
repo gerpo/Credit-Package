@@ -9,6 +9,7 @@ use Gerpo\DmsCredits\Events\AccountDisabled;
 use Gerpo\DmsCredits\Events\AccountEnabled;
 use Gerpo\DmsCredits\Events\CreditsAdded;
 use Gerpo\DmsCredits\Events\CreditsSubtracted;
+use Gerpo\DmsCredits\Events\CreditsTransferred;
 use Gerpo\DmsCredits\Exceptions\InsufficientCreditsException;
 use Gerpo\DmsCredits\Resources\Transaction;
 use Illuminate\Database\Eloquent\Model;
@@ -37,7 +38,7 @@ class CreditAccount extends Model
         return static::uuid($attributes['uuid']);
     }
 
-    public static function uuid(string $uuid): ?CreditAccount
+    public static function uuid(string $uuid): CreditAccount
     {
         return static::where('uuid', $uuid)->first();
     }
@@ -47,18 +48,18 @@ class CreditAccount extends Model
         event(new CreditsAdded($this->uuid, $amount, $message));
     }
 
-    /**
-     * @param string $amount
-     * @throws InsufficientCreditsException
-     */
     public function subtractCredits(string $amount): void
     {
-
-        if ($this->balance - $amount < config('DmsCredit.minimum_balance')) {
+        if (!$this->hasSufficientCreditsToSubtract($amount)) {
             throw InsufficientCreditsException::subtraction($this, $amount);
         }
 
         event(new CreditsSubtracted($this->uuid, $amount));
+    }
+
+    private function hasSufficientCreditsToSubtract($amount): bool
+    {
+        return $this->balance - $amount >= config('DmsCredit.minimum_balance');
     }
 
     public function enableAccount(): void
@@ -69,6 +70,15 @@ class CreditAccount extends Model
     public function disableAccount(): void
     {
         event(new AccountDisabled($this->uuid));
+    }
+
+    public function transferCredits($targetUuid, $amount): void
+    {
+        if (!$this->hasSufficientCreditsToSubtract($amount)) {
+            throw InsufficientCreditsException::subtraction($this, $amount);
+        }
+
+        event(new CreditsTransferred($this->uuid, $targetUuid, $amount));
     }
 
     public function owner(): MorphTo

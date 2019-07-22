@@ -38,6 +38,14 @@
     "phpunit/phpunit": "^8.0",
     "orchestra/testbench": "^3.6"
   },
+  "scripts": {
+    "post-package-update": [
+      "npm install --save-dev chart.js"
+    ],
+    "post-package-uninstall": [
+      "npm uninstall chart.js"
+    ]
+  },
   "extra": {
     "laravel": {
       "providers": [

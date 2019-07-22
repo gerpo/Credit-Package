@@ -54,6 +54,10 @@ class CreditServiceProvider extends ServiceProvider
                 )
         ], 'dms-credits.vue-components');
 
+        $this->publishes([
+            __DIR__.'/Resources/credits.svg' => resource_path('assets/images/icons/credits.svg'),
+        ], 'dms-credits.package-icon');
+
     }
 
     private function registerProjectors(Projectionist $projectionist): void

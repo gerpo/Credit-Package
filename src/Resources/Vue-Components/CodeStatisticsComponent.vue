@@ -1,5 +1,7 @@
 <template>
-    
+    <div class="codes-statistics">
+
+    </div>
 </template>
 
 <script>

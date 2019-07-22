@@ -4,6 +4,7 @@ namespace DmsCredits\Tests;
 
 use Gerpo\DmsCredits\Events\CreditsAdded;
 use Gerpo\DmsCredits\Events\CreditsSubtracted;
+use Gerpo\DmsCredits\Events\CreditsTransferred;
 use Spatie\EventProjector\Models\StoredEvent;
 
 class AccountBalanceProjectorTest extends TestCase
@@ -58,5 +59,37 @@ class AccountBalanceProjectorTest extends TestCase
         $event = StoredEvent::where('event_class', CreditsSubtracted::class)->first();
 
         $this->assertEquals($message, $event->event_properties['message']);
+    }
+
+    /** @test */
+    public function CreditsTransferred_subtracts_right_amount_on_source(): void
+    {
+        $source = createAccount([
+            'balance' => 200,
+        ]);
+
+        $target = createAccount();
+
+        $this->assertEquals(200, $source->balance);
+
+        event(new CreditsTransferred($source->uuid, $target->uuid, 200));
+
+        $this->assertEquals(0, $source->fresh()->balance);
+    }
+
+    /** @test */
+    public function CreditsTransferred_adds_right_amount_to_target(): void
+    {
+        $source = createAccount([
+            'balance' => 200,
+        ]);
+
+        $target = createAccount();
+
+        $this->assertEquals(0, $target->balance);
+
+        event(new CreditsTransferred($source->uuid, $target->uuid, 200));
+
+        $this->assertEquals(200, $target->fresh()->balance);
     }
 }

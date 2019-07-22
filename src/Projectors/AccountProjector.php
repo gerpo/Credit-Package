@@ -13,18 +13,12 @@ class AccountProjector implements Projector
 {
     use ProjectsEvents;
 
-    /*
-     * Here you can specify which event should trigger which method.
-     */
     protected $handlesEvents = [
         AccountCreated::class => 'onAccountCreated',
         AccountEnabled::class => 'onAccountEnabled',
         AccountDisabled::class => 'onAccountDisabled',
     ];
 
-    /**
-     * @param AccountCreated $event
-     */
     public function onAccountCreated(AccountCreated $event): void
     {
         CreditAccount::create($event->accountAttributes);
@@ -33,9 +27,6 @@ class AccountProjector implements Projector
     public function onAccountEnabled(AccountEnabled $event): void
     {
         $account = CreditAccount::uuid($event->accountUuid);
-        if ($account === null) {
-            return;
-        }
 
         $account->is_active = true;
         $account->save();
@@ -44,9 +35,6 @@ class AccountProjector implements Projector
     public function onAccountDisabled(AccountDisabled $event): void
     {
         $account = CreditAccount::uuid($event->accountUuid);
-        if ($account === null) {
-            return;
-        }
 
         $account->is_active = false;
         $account->save();

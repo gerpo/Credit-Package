@@ -21,9 +21,14 @@
                          role="tabpanel">
                         <account :account="account"/>
                     </div>
-                    <codes class="tab-pane fade show" id="nav-codes" role="tabpanel" v-if="$can('create_codes')"/>
-                    <code-statistics-component class="tab-pane fade show" id="nav-statistics" role="tabpanel"
-                                               v-if="$can('code_statistics')"/>
+                    <div class="tab-pane fade" id="nav-codes"
+                         role="tabpanel" v-if="$can('create_codes')">
+                        <codes />
+                    </div>
+                    <div class="tab-pane fade" id="nav-statistics"
+                         role="tabpanel" v-if="$can('code_statistics')">
+                        <code-statistics-component />
+                    </div>
                 </div>
             </div>
         </div>
@@ -56,7 +61,8 @@
                 $('.nav-tabs a[href="#' + url.split('#')[1] + '"]').tab('show');
             }
 
-            $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+            $('a[data-toggle="tab"]').on('click', function (e) {
+                e.preventDefault();
                 window.location.hash = e.target.hash;
             })
         }
