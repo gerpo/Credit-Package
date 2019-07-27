@@ -53,16 +53,6 @@ class TestCase extends \Orchestra\Testbench\TestCase
         $app['config']->set('auth.providers.users.model', User::class);
     }
 
-    /**
-     * Resolve application HTTP Kernel implementation.
-     *
-     * @param \Illuminate\Foundation\Application $app
-     * @return void
-     */
-    protected function resolveApplicationHttpKernel($app)
-    {
-        $app->singleton('Illuminate\Contracts\Http\Kernel', TestHttpKernel::class);
-    }
 
     protected function setUp(): void
     {
@@ -76,6 +66,7 @@ class TestCase extends \Orchestra\Testbench\TestCase
             ['--provider' => BouncerServiceProvider::class,]);
 
         $this->migrate();
+        Bouncer::make()->create()->allow('admin')->everything();
     }
 
     private function removeOldMigrations(): void
