@@ -3,12 +3,16 @@ language: php
 php:
   - 7.3
 
+services:
+  - mysql
+
 before_install:
   - sudo apt-get update
+  - mysql -e 'create database credits_test;'
   - travis_retry composer self-update
 
 install:
-  - travis_retry composer update --prefer-source
+  - travis_retry composer update --prefer-source --no-interaction
 
 script:
   - phpunit

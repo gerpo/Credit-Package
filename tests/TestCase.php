@@ -6,6 +6,7 @@ use Gerpo\DmsCredits\CreditServiceProvider;
 use Gerpo\DmsCredits\Traits\HasCreditAccount;
 use Gerpo\DmsCredits\Traits\UsesCodes;
 use Illuminate\Support\Facades\Schema;
+use Silber\Bouncer\Bouncer;
 use Silber\Bouncer\BouncerServiceProvider;
 use Silber\Bouncer\Database\HasRolesAndAbilities;
 use Spatie\EventProjector\EventProjectorServiceProvider;
@@ -44,9 +45,12 @@ class TestCase extends \Orchestra\Testbench\TestCase
             'driver' => 'mysql',
             'database' => 'credits_test',
             'host' => '127.0.0.1',
-            'username' => 'root',
-            'password' => 'root',
+            'username' => 'travis',
+            'password' => '',
         ]);
+
+        Bouncer::make()->create()->useUserModel(User::class);
+        $app['config']->set('auth.providers.users.model', User::class);
     }
 
     /**
