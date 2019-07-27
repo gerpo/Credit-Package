@@ -98,7 +98,7 @@ class TestCase extends \Orchestra\Testbench\TestCase
         $this->removeOldMigrations();
     }
 
-    protected function signIn($user = null, $ability = null)
+    protected function signIn($user = null, string $ability = null)
     {
         $user = $user ?: createUser();
 

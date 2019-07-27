@@ -13,7 +13,9 @@ function createAccount(array $attributes = [], $user = null)
 
 function createUser()
 {
-    return User::create();
+    return tap(User::create(), function($user) {
+        $user->allow('have_credits');
+    });
 }
 
 function createCode(int $value = 500, $user = null)

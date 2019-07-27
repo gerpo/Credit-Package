@@ -1,7 +1,7 @@
 <?php
 
 
-Route::group(['middleware' => ['web', 'auth']], function () {
+Route::group(['middleware' => ['web', 'auth', 'can:have_credits']], function () {
     Route::get('credits', 'Gerpo\DmsCredits\Controllers\AccountController@index')->name('credits.index');
 
     Route::post('/credits/purchase', 'Gerpo\DmsCredits\Controllers\PurchaseController@store');
