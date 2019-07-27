@@ -11,12 +11,6 @@
       "email": "adamarc@web.de"
     }
   ],
-  "repositories": [
-    {
-      "type": "vcs",
-      "url": "D:\\Web-Projekte\\Plugisto"
-    }
-  ],
   "autoload": {
     "psr-4": {
       "Gerpo\\DmsCredits\\": "./src"
@@ -35,16 +29,9 @@
     "ramsey/uuid": "^3.8"
   },
   "require-dev": {
+    "roave/security-advisories": "dev-master",
     "phpunit/phpunit": "^8.0",
     "orchestra/testbench": "^3.6"
-  },
-  "scripts": {
-    "post-package-update": [
-      "npm install --save-dev chart.js"
-    ],
-    "post-package-uninstall": [
-      "npm uninstall chart.js"
-    ]
   },
   "extra": {
     "laravel": {

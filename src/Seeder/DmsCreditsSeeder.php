@@ -9,7 +9,7 @@ class DmsCreditsSeeder extends Seeder
      *
      * @return void
      */
-    public function run()
+    public function run(): void
     {
         Bouncer::ability()->create([
             'name' => 'have_credits',
@@ -27,7 +27,7 @@ class DmsCreditsSeeder extends Seeder
         ]);
 
         Bouncer::ability()->create([
-            'name' => 'code_statistics',
+            'name' => 'view_code_statistics',
             'title' => 'See statistics about created and used codes.'
         ]);
     }

@@ -27,7 +27,7 @@ class CodeController extends Controller
         });
 
         return PDF::loadView('DmsCredits::codesPdfTemplate', ['codes' => $codes])
-            ->setPaper('a4', 'portrait')
+            ->setPaper('a4')
             ->stream();
     }
 

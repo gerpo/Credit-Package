@@ -14,7 +14,7 @@ class Transaction extends JsonResource
         return $this->assignEventData(array_pop($eventName));
     }
 
-    private function assignEventData($eventName)
+    private function assignEventData($eventName): array
     {
         switch($eventName)
         {

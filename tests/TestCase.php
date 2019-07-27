@@ -15,7 +15,7 @@ class TestCase extends \Orchestra\Testbench\TestCase
     /**
      * Get package providers.
      *
-     * @param  \Illuminate\Foundation\Application $app
+     * @param \Illuminate\Foundation\Application $app
      *
      * @return array
      */
@@ -31,24 +31,33 @@ class TestCase extends \Orchestra\Testbench\TestCase
     /**
      * Define environment setup.
      *
-     * @param  \Illuminate\Foundation\Application $app
+     * @param \Illuminate\Foundation\Application $app
      *
      * @return void
      */
     protected function getEnvironmentSetUp($app): void
     {
         $app['config']->set('app.key', '6rE9Nz59bGRbeMATftriyQjrpF7DcOQm');
+
+        $app['config']->set('database.default', 'testbench');
+        $app['config']->set('database.connections.testbench', [
+            'driver' => 'mysql',
+            'database' => 'credits_test',
+            'host' => '127.0.0.1',
+            'username' => 'root',
+            'password' => 'root',
+        ]);
     }
 
     /**
      * Resolve application HTTP Kernel implementation.
      *
-     * @param  \Illuminate\Foundation\Application  $app
+     * @param \Illuminate\Foundation\Application $app
      * @return void
      */
     protected function resolveApplicationHttpKernel($app)
     {
-        $app->singleton('Illuminate\Contracts\Http\Kernel', \DmsCredits\Tests\TestHttpKernel::class);
+        $app->singleton('Illuminate\Contracts\Http\Kernel', TestHttpKernel::class);
     }
 
     protected function setUp(): void
@@ -78,11 +87,13 @@ class TestCase extends \Orchestra\Testbench\TestCase
 
     private function migrate()
     {
-        $this->artisan('migrate', ['--database' => 'testing']);
+        $this->artisan('migrate:fresh');
 
         Schema::create('users', function ($table) {
             $table->increments('id');
-            $table->string('name')->nullable();
+            $table->string('firstname')->nullable();
+            $table->string('lastname')->nullable();
+            $table->string('username')->nullable();
             $table->timestamps();
         });
     }

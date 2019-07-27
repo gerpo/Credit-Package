@@ -14,5 +14,8 @@ Route::group(['middleware' => ['web', 'auth']], function () {
         'Gerpo\DmsCredits\Controllers\CodeController@create')->name('credits.code.create')->middleware('check_ability:create_codes');
     Route::post('/credits/code/redeem',
         'Gerpo\DmsCredits\Controllers\CodeController@redeem')->name('credits.code.redeem');
+
+    Route::get('/credits/code/statistics',
+        'Gerpo\DmsCredits\Controllers\CreditStatisticsController@index')->name('credits.statistics.index')->middleware('check_ability:view_code_statistics');
 });
 
