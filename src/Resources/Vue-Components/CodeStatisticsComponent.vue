@@ -78,11 +78,13 @@
                     <span class="text-capitalize" v-else>Deleted</span>
                 </td>
                 <td :class="{'text-muted': row.exported}">
-                    <span :title="$tv('DmsCredits.statistics.created_codes') | capitalize">{{ row.created_codes | number }}</span> /
+                    <span :title="$tv('DmsCredits.statistics.created_codes') | capitalize">{{ row.created_codes | number }}</span>
+                    /
                     <span :title="$tv('DmsCredits.statistics.used_codes') | capitalize">{{ row.used_codes | number }}</span>
                 </td>
                 <td :class="{'text-muted': row.exported}">
-                    <span :title="$tv('DmsCredits.statistics.created_value') | capitalize">{{ row.created_value | number }}</span> /
+                    <span :title="$tv('DmsCredits.statistics.created_value') | capitalize">{{ row.created_value | number }}</span>
+                    /
                     <span :title="$tv('DmsCredits.statistics.used_value') | capitalize">{{ row.used_value | number }}</span>
                 </td>
             </template>
@@ -198,13 +200,10 @@
                 return labels;
             },
             setDefaultDates() {
-                if (this.requestData.type === 'daily') {
-                    this.requestData.start_timestamp = this.$moment().subtract(1, 'month').format('YYYY-MM-DD');
-                    this.requestData.end_timestamp = this.$moment().add(1, 'day').format('YYYY-MM-DD');
-                } else {
-                    this.requestData.start_timestamp = this.$moment().subtract(1, 'year').format('YYYY-MM-DD');
-                    this.requestData.end_timestamp = this.$moment().format('YYYY-MM-DD');
-                }
+                this.requestData.end_timestamp = this.$moment().add(1, 'day').format('YYYY-MM-DD');
+                this.requestData.start_timestamp = (this.requestData.type === 'daily') ?
+                    this.$moment().subtract(1, 'month').format('YYYY-MM-DD') :
+                    this.$moment().subtract(1, 'year').format('YYYY-MM-DD');
             },
             transformTotalData(data) {
                 this.generalData.created_codes = data.total_data.created_codes;

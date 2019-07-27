@@ -20,6 +20,7 @@ class CreditStatisticsController extends Controller
             'start_timestamp' => 'date',
             'end_timestamp' => 'date',
         ]);
+
         $data['type'] = $data['type'] ?? 'monthly';
 
         if ($data['type'] === 'daily') {

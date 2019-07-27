@@ -116,6 +116,8 @@ class CodeControllerTest extends TestCase
             'code' => $code->code,
             'used_by' => $user->id,
         ]);
+
+        $this->assertEquals(500, $user->creditAccount->fresh()->balance);
     }
 
     /** @test */
@@ -134,6 +136,8 @@ class CodeControllerTest extends TestCase
             'code' => $code->code,
             'used_by' => $user->id,
         ]);
+
+        $this->assertEquals(500, $user->creditAccount->fresh()->balance);
     }
 
     /** @test */
@@ -143,8 +147,6 @@ class CodeControllerTest extends TestCase
         $code = createCode();
 
         $this->actingAs($user);
-
-        Event::fake([CreditsAdded::class]);
 
         $this->post(route('credits.code.redeem'), ['code' => 'abcdef'])
             ->assertStatus(302);
@@ -159,9 +161,7 @@ class CodeControllerTest extends TestCase
             'used_by' => $user->id,
         ]);
 
-        Event::assertNotDispatched(CreditsAdded::class, function ($event) use ($user) {
-            return $event->accountUuid === $user->fresh()->creditAccount->uuid;
-        });
+        $this->assertEquals(0, $user->creditAccount->fresh()->balance);
     }
 
     /** @test */
@@ -174,8 +174,6 @@ class CodeControllerTest extends TestCase
         $value = 200;
         $code = createCode($value);
 
-        Event::fake([CreditsAdded::class]);
-
         $this->post(route('credits.code.redeem'), ['code' => $code->code])
             ->assertSuccessful();
 
@@ -183,10 +181,7 @@ class CodeControllerTest extends TestCase
             'code' => $code->code,
             'used_by' => $user->id,
         ]);
-
-        Event::assertDispatched(CreditsAdded::class, function ($event) use ($user, $value) {
-            return $event->accountUuid === $user->fresh()->creditAccount->uuid && $event->amount === $value;
-        });
+        $this->assertEquals(200, $user->creditAccount->fresh()->balance);
 
         $this->post(route('credits.code.redeem'), ['code' => $code->code])
             ->assertStatus(302);
@@ -196,9 +191,7 @@ class CodeControllerTest extends TestCase
             'used_by' => $user2->id,
         ]);
 
-        Event::assertNotDispatched(CreditsAdded::class, function ($event) use ($user2) {
-            return $event->accountUuid === $user2->fresh()->creditAccount->uuid;
-        });
+        $this->assertEquals(0, $user2->creditAccount->fresh()->balance);
     }
 
     /** @test */
@@ -210,8 +203,6 @@ class CodeControllerTest extends TestCase
         $value = 200;
         $code = createCode($value);
 
-        Event::fake([CreditsAdded::class]);
-
         $this->post(route('credits.code.redeem'), ['code' => $code->code])
             ->assertSuccessful();
 
@@ -220,14 +211,10 @@ class CodeControllerTest extends TestCase
             'used_by' => $user->id,
         ]);
 
-
         $this->post(route('credits.code.redeem'), ['code' => $code->code])
             ->assertStatus(302);
 
-        Event::assertDispatched(CreditsAdded::class, 1);
-        Event::assertDispatched(CreditsAdded::class, function ($event) use ($user, $value) {
-            return $event->accountUuid === $user->fresh()->creditAccount->uuid && $event->amount === $value;
-        });
+        $this->assertEquals(200, $user->creditAccount->fresh()->balance);
     }
 
     /** @test */
@@ -235,12 +222,13 @@ class CodeControllerTest extends TestCase
     {
         $code = createCode();
 
-        Event::fake([CreditsAdded::class]);
-
         $this->post(route('credits.code.redeem'), ['code' => $code->code])
             ->assertStatus(500);
 
-        Event::assertNotDispatched(CreditsAdded::class);
+        $this->assertDatabaseHas('codes', [
+            'code' => $code->code,
+            'used_by' => null
+        ]);
     }
 
     protected function setUp(): void

@@ -9,8 +9,8 @@
             </template>
             <template slot-scope="{row, index}">
                 <td>{{ row.created_at | moment('calendar') }}</td>
-                <td class="w-100">{{ $tv(row.message, {value: row.amount }) }}</td>
-                <td class="text-right">{{ row.amount | number('-') }}</td>
+                <td class="w-100">{{ $tv(row.message, {value: Math.abs(row.amount) }) }}</td>
+                <td :class="{'text-danger': row.amount < 0}" class="text-right">{{ row.amount | number('-') }}</td>
             </template>
         </table-component>
     </div>

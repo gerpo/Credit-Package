@@ -9,10 +9,10 @@ use Spatie\EventProjector\ShouldBeStored;
 class AccountDisabled implements ShouldBeStored
 {
     /** @var string */
-    public $accountUuid;
+    public $message;
 
-    public function __construct(string $accountUuid)
+    public function __construct(string $message = null)
     {
-        $this->accountUuid = $accountUuid;
+        $this->message = $message ?? 'DmsCredits::account_enabled';
     }
 }

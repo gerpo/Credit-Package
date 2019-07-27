@@ -39,7 +39,7 @@ class CreditStatisticsControllerTest extends TestCase
                 'used_value' => 0,
             ],
             'creator_data' => [
-                2 => [
+                [
                     'created_codes' => 1,
                     'created_value' => 500,
                     'used_codes' => 0,

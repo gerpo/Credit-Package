@@ -10,4 +10,6 @@ return [
 
     // Event messages
     'account_created' => 'A new account was created.',
+    'credits_added' => ':value credits were added.',
+    'credits_subtracted' => ':value credits were subtracted.',
 ];

@@ -19,25 +19,25 @@ class AccountBalanceProjector implements Projector
         CreditsTransferred::class => 'onCreditsTransferred',
     ];
 
-    public function onCreditsAdded(CreditsAdded $event): void
+    public function onCreditsAdded(CreditsAdded $event, string $aggregateUuid): void
     {
-        $account = CreditAccount::uuid($event->accountUuid);
+        $account = CreditAccount::uuid($aggregateUuid);
 
         $account->balance += $event->amount;
         $account->save();
     }
 
-    public function onCreditsSubtracted(CreditsSubtracted $event): void
+    public function onCreditsSubtracted(CreditsSubtracted $event, string $aggregateUuid): void
     {
-        $account = CreditAccount::uuid($event->accountUuid);
+        $account = CreditAccount::uuid($aggregateUuid);
 
         $account->balance -= $event->amount;
         $account->save();
     }
 
-    public function onCreditsTransferred(CreditsTransferred $event): void
+    public function onCreditsTransferred(CreditsTransferred $event, string $aggregateUuid): void
     {
-        $source = CreditAccount::uuid($event->sourceUuid);
+        $source = CreditAccount::uuid($aggregateUuid);
         $target = CreditAccount::uuid($event->targetUuid);
 
         $source->balance -= $event->amount;

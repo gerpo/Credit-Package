@@ -6,40 +6,37 @@ namespace DmsCredits\Tests;
 
 use Gerpo\DmsCredits\Events\AccountDisabled;
 use Gerpo\DmsCredits\Events\AccountEnabled;
-use Gerpo\DmsCredits\Events\CreditsAdded;
 use Gerpo\DmsCredits\Events\CreditsSubtracted;
 use Gerpo\DmsCredits\Events\CreditsTransferred;
-use Gerpo\DmsCredits\Exceptions\InsufficientCreditsException;
+use Gerpo\DmsCredits\Exceptions\CouldNotSubtractCredits;
+use Gerpo\DmsCredits\Exceptions\CouldNotTransferCredits;
 use Illuminate\Support\Facades\Event;
 
 class CreditAccountTest extends TestCase
 {
     /** @test */
-    public function addCredits_dispatches_correct_CreditsAdded_Event(): void
+    public function addCredits_adds_correct_amount(): void
     {
         $account = createAccount();
 
-        Event::fakeFor(function () use ($account) {
-            $account->addCredits(200);
+        $this->assertEquals(0, $account->fresh()->balance);
 
-            Event::assertDispatched(CreditsAdded::class, function ($event) use ($account) {
-                return $event->accountUuid === $account->uuid && $event->amount === 200;
-            });
-        });
+        $account->addCredits(200);
+
+        $this->assertEquals(200, $account->fresh()->balance);
     }
 
     /** @test */
-    public function subtractCredits_dispatches_correct_CreditsSubtracted_Event(): void
+    public function subtractCredits_subtracts_correct_amount(): void
     {
-        $account = createAccount(['balance' => 200]);
+        $account = createAccount();
+        $account->addCredits(200);
 
-        Event::fakeFor(function () use ($account) {
-            $account->subtractCredits(200);
+        $this->assertEquals(200, $account->fresh()->balance);
 
-            Event::assertDispatched(CreditsSubtracted::class, function ($event) use ($account) {
-                return $event->accountUuid === $account->uuid && $event->amount === 200;
-            });
-        });
+        $account->subtractCredits(200);
+
+        $this->assertEquals(0, $account->fresh()->balance);
     }
 
     /** @test */
@@ -48,77 +45,89 @@ class CreditAccountTest extends TestCase
         $account = createAccount();
 
         $this->assertEquals(0, $account->balance);
-        $this->expectException(InsufficientCreditsException::class);
+        $this->expectException(CouldNotSubtractCredits::class);
 
-        Event::fakeFor(function () use ($account) {
-            $account->subtractCredits(200);
-
-            Event::assertNotDispatched(CreditsSubtracted::class);
-        });
+        $account->subtractCredits(200);
 
         $this->assertEquals(0, $account->fresh()->balance);
     }
 
     /** @test */
-    public function enableAccount_dispatches_correct_AccountEnabled_Event(): void
+    public function enableAccount_enables_account(): void
     {
-        $account = createAccount();
+        $account = createAccount(['is_active' => false]);
 
-        Event::fakeFor(function () use ($account) {
-            $account->enableAccount();
+        $this->assertFalse($account->is_active);
 
-            Event::assertDispatched(AccountEnabled::class, function ($event) use ($account) {
-                return $event->accountUuid === $account->uuid;
-            });
-        });
+        $account->enableAccount();
+
+        $this->assertTrue($account->fresh()->is_active);
     }
 
     /** @test */
-    public function disableAccount_dispatches_correct_AccountDisabled_Event(): void
+    public function disableAccount_disables_account(): void
     {
         $account = createAccount();
 
-        Event::fakeFor(function () use ($account) {
-            $account->disableAccount();
+        $this->assertTrue($account->is_active);
 
-            Event::assertDispatched(AccountDisabled::class, function ($event) use ($account) {
-                return $event->accountUuid === $account->uuid;
-            });
-        });
+        $account->disableAccount();
+
+        $this->assertFalse($account->fresh()->is_active);
     }
 
     /** @test */
-    public function transferCredits_dispatches_correct_CreditsTransferred_Event(): void
+    public function transferCredits_subtracts_correct_amount_from_source(): void
     {
-        $account = createAccount(['balance' => 200]);
+        $account = createAccount();
+        $account->addCredits(200);
+
         $target = createAccount();
 
-        Event::fakeFor(function () use ($account, $target) {
-            $account->transferCredits($target->uuid, 200);
+        $account->transferCredits($target->uuid, 200);
 
-            Event::assertDispatched(CreditsTransferred::class, function ($event) use ($account, $target) {
-                return $event->sourceUuid === $account->uuid &&
-                    $event->targetUuid === $target->uuid &&
-                    $event->amount === 200;
-            });
-        });
+        $this->assertEquals(0, $account->fresh()->balance);
+    }
+
+    /** @test */
+    public function transferCredits_adds_correct_amount_to_target(): void
+    {
+        $account = createAccount();
+        $account->addCredits(200);
+
+        $target = createAccount();
+
+        $account->transferCredits($target->uuid, 200);
+
+        $this->assertEquals(200, $target->fresh()->balance);
     }
 
     /** @test */
     public function transferCredits_throws_exception_if_balance_is_insufficient(): void
     {
-        $account = createAccount(['balance' => 0]);
+        $account = createAccount();
         $target = createAccount();
 
-        $this->expectException(InsufficientCreditsException::class);
+        $this->expectException(CouldNotTransferCredits::class);
+        $this->expectExceptionMessage(CouldNotTransferCredits::notEnoughCredits(200)->getMessage());
 
-        Event::fakeFor(function () use ($account, $target) {
-            $account->transferCredits($target->uuid, 200);
-
-            Event::assertNotDispatched(CreditsTransferred::class);
-        });
+        $account->transferCredits($target->uuid, 200);
 
         $this->assertEquals(0, $account->fresh()->balance);
         $this->assertEquals(0, $target->fresh()->balance);
+    }
+
+    /** @test */
+    public function transferCredits_throws_exception_if_target_account_does_not_exists(): void
+    {
+        $account = createAccount();
+        $account->addCredits(200);
+
+        $this->expectException(CouldNotTransferCredits::class);
+        $this->expectExceptionMessage(CouldNotTransferCredits::targetDoesNotExist()->getMessage());
+
+        $account->transferCredits('INVALID_UUID', 200);
+
+        $this->assertEquals(0, $account->fresh()->balance);
     }
 }

@@ -4,6 +4,7 @@
 use DmsCredits\Tests\TestCase;
 use Gerpo\DmsCredits\Events\CreditsAdded;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\EventProjector\Models\StoredEvent;
 
 class UsesCodesTraitTest extends TestCase
 {
@@ -18,13 +19,12 @@ class UsesCodesTraitTest extends TestCase
 
         $this->actingAs($user);
 
-        $this->withoutExceptionHandling()
-            ->post(route('credits.code.redeem'), ['code' => $code->code])
+        $this->assertEquals(0, $user->creditAccount->balance);
+
+        $this->post(route('credits.code.redeem'), ['code' => $code->code])
             ->assertSuccessful();
 
-        Event::assertDispatched(CreditsAdded::class, function ($event) use ($value) {
-            return $event->amount === $value;
-        });
+        $this->assertEquals(250, $user->creditAccount->fresh()->balance);
     }
 
     /** @test */
@@ -38,8 +38,7 @@ class UsesCodesTraitTest extends TestCase
 
         $this->assertNull($code->fresh()->user);
 
-        $this->withoutExceptionHandling()
-            ->post(route('credits.code.redeem'), ['code' => $code->code])
+        $this->post(route('credits.code.redeem'), ['code' => $code->code])
             ->assertSuccessful();
 
         $this->assertEquals($user->id, $code->fresh()->user->id);
@@ -64,8 +63,6 @@ class UsesCodesTraitTest extends TestCase
     /** @test */
     public function used_at_timestamp_is_set_when_code_is_used(): void
     {
-        Model::setEventDispatcher($this->initialDispatcher);
-
         $user = createUser();
         $code = createCode();
 
@@ -73,8 +70,7 @@ class UsesCodesTraitTest extends TestCase
 
         $this->assertNull($code->fresh()->used_at);
 
-        $this->withoutExceptionHandling()
-            ->post(route('credits.code.redeem'), ['code' => $code->code])
+        $this->post(route('credits.code.redeem'), ['code' => $code->code])
             ->assertSuccessful();
 
         $this->assertNotNull($code->fresh()->used_at);
@@ -90,22 +86,11 @@ class UsesCodesTraitTest extends TestCase
 
         $this->actingAs($user);
 
-        $this->withoutExceptionHandling()
-            ->post(route('credits.code.redeem'), ['code' => $code->code])
+        $this->post(route('credits.code.redeem'), ['code' => $code->code])
             ->assertSuccessful();
 
-        Event::assertDispatched(CreditsAdded::class, function ($event) use($value) {
-            return $event->message === 'DmsCredits::code.redeem_message';
-        });
-    }
+        $event = StoredEvent::where('event_class', CreditsAdded::class)->first();
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->initialDispatcher = Event::getFacadeRoot();
-        Event::fake([
-            CreditsAdded::class,
-        ]);
+        $this->assertEquals('DmsCredits::code.redeem_message', $event->event_properties['message']);
     }
 }

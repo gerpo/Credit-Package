@@ -2,8 +2,9 @@
 
 namespace Gerpo\DmsCredits\Traits;
 
+use Gerpo\DmsCredits\Aggregates\AccountAggregate;
 use Gerpo\DmsCredits\Models\CreditAccount;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Ramsey\Uuid\Uuid;
 
 trait HasCreditAccount
 {
@@ -16,10 +17,13 @@ trait HasCreditAccount
         $account = $this->morphOne(static::$creditAccountClass, static::$morphFieldName);
 
         if ($account->get()->isEmpty()) {
-            static::$creditAccountClass::createWithAttributes([
-                'owner_id' => $this->id,
-                'owner_type' => __CLASS__,
-            ]);
+            $newUuid = (string)Uuid::uuid4();
+            AccountAggregate::retrieve($newUuid)
+                ->createAccount([
+                    'owner_id' => $this->id,
+                    'owner_type' => __CLASS__,
+                ])
+                ->persist();
         }
 
         return $this->morphOne(static::$creditAccountClass, static::$morphFieldName);

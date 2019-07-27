@@ -19,22 +19,31 @@ class AccountProjector implements Projector
         AccountDisabled::class => 'onAccountDisabled',
     ];
 
-    public function onAccountCreated(AccountCreated $event): void
+    public function onStartingEventReplay(): void
     {
-        CreditAccount::create($event->accountAttributes);
+        CreditAccount::truncate();
     }
 
-    public function onAccountEnabled(AccountEnabled $event): void
+    public function onAccountCreated(AccountCreated $event, string $aggregateUuid): void
     {
-        $account = CreditAccount::uuid($event->accountUuid);
+        CreditAccount::create([
+            'uuid' => $aggregateUuid,
+            'owner_id' => $event->accountAttributes['owner_id'],
+            'owner_type' => $event->accountAttributes['owner_type'],
+            ]);
+    }
+
+    public function onAccountEnabled(AccountEnabled $event, string $aggregateUuid): void
+    {
+        $account = CreditAccount::uuid($aggregateUuid);
 
         $account->is_active = true;
         $account->save();
     }
 
-    public function onAccountDisabled(AccountDisabled $event): void
+    public function onAccountDisabled(AccountDisabled $event, string $aggregateUuid): void
     {
-        $account = CreditAccount::uuid($event->accountUuid);
+        $account = CreditAccount::uuid($aggregateUuid);
 
         $account->is_active = false;
         $account->save();

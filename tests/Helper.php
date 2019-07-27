@@ -8,12 +8,7 @@ function createAccount(array $attributes = [], $user = null)
 {
     $user = $user ?: createUser();
 
-    $attributes = array_merge([
-        'owner_id' => $user->id,
-        'owner_type' => User::class
-    ], $attributes);
-
-    return CreditAccount::createWithAttributes($attributes);
+    return tap($user->creditAccount)->update($attributes);
 }
 
 function createUser()

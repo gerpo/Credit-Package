@@ -4,17 +4,11 @@
 namespace Gerpo\DmsCredits\Models;
 
 
-use Gerpo\DmsCredits\Events\AccountCreated;
-use Gerpo\DmsCredits\Events\AccountDisabled;
-use Gerpo\DmsCredits\Events\AccountEnabled;
-use Gerpo\DmsCredits\Events\CreditsAdded;
-use Gerpo\DmsCredits\Events\CreditsSubtracted;
-use Gerpo\DmsCredits\Events\CreditsTransferred;
-use Gerpo\DmsCredits\Exceptions\InsufficientCreditsException;
+use Gerpo\DmsCredits\Aggregates\AccountAggregate;
 use Gerpo\DmsCredits\Resources\Transaction;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
-use Ramsey\Uuid\Uuid;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Spatie\EventProjector\Models\StoredEvent;
 
 class CreditAccount extends Model
@@ -29,56 +23,34 @@ class CreditAccount extends Model
         'is_active' => 'boolean',
     ];
 
-    public static function createWithAttributes(array $attributes = []): CreditAccount
-    {
-        $attributes['uuid'] = (string)Uuid::uuid4();
-
-        event(new AccountCreated($attributes));
-
-        return static::uuid($attributes['uuid']);
-    }
-
-    public static function uuid(string $uuid): CreditAccount
+    public static function uuid(string $uuid): ?CreditAccount
     {
         return static::where('uuid', $uuid)->first();
     }
 
     public function addCredits(int $amount, string $message = null): void
     {
-        event(new CreditsAdded($this->uuid, $amount, $message));
+        AccountAggregate::retrieve($this->uuid)->addCredits($amount, $message)->persist();
     }
 
-    public function subtractCredits(string $amount): void
+    public function subtractCredits(string $amount, string $message = null): void
     {
-        if (!$this->hasSufficientCreditsToSubtract($amount)) {
-            throw InsufficientCreditsException::subtraction($this, $amount);
-        }
-
-        event(new CreditsSubtracted($this->uuid, $amount));
-    }
-
-    private function hasSufficientCreditsToSubtract($amount): bool
-    {
-        return $this->balance - $amount >= config('DmsCredit.minimum_balance');
+        AccountAggregate::retrieve($this->uuid)->subtractCredits($amount, $message)->persist();
     }
 
     public function enableAccount(): void
     {
-        event(new AccountEnabled($this->uuid));
+        AccountAggregate::retrieve($this->uuid)->enableAccount()->persist();
     }
 
     public function disableAccount(): void
     {
-        event(new AccountDisabled($this->uuid));
+        AccountAggregate::retrieve($this->uuid)->disableAccount()->persist();
     }
 
     public function transferCredits($targetUuid, $amount): void
     {
-        if (!$this->hasSufficientCreditsToSubtract($amount)) {
-            throw InsufficientCreditsException::subtraction($this, $amount);
-        }
-
-        event(new CreditsTransferred($this->uuid, $targetUuid, $amount));
+        AccountAggregate::retrieve($this->uuid)->transferCredits($targetUuid, $amount)->persist();
     }
 
     public function owner(): MorphTo
@@ -86,9 +58,8 @@ class CreditAccount extends Model
         return $this->morphTo();
     }
 
-    public function getTransactionsAttribute()
+    public function getTransactionsAttribute(): AnonymousResourceCollection
     {
-        return Transaction::collection(StoredEvent::where('event_properties->accountAttributes->uuid',
-            $this->uuid)->orWhere('event_properties->uuid', $this->accountUuid)->get());
+        return Transaction::collection(StoredEvent::where('aggregate_uuid', $this->uuid)->get());
     }
 }
