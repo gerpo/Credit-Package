@@ -29,6 +29,8 @@ class CodeControllerTest extends TestCase
     /** @test */
     public function code_is_successfully_created(): void
     {
+        Bus::fake();
+
         $user = createUser();
         $this->signInAdmin($user);
 
@@ -43,6 +45,8 @@ class CodeControllerTest extends TestCase
     /** @test */
     public function multiple_codes_are_successfully_created(): void
     {
+        Bus::fake();
+
         $user = createUser();
         $this->signInAdmin($user);
 
@@ -57,6 +61,8 @@ class CodeControllerTest extends TestCase
     /** @test */
     public function admin_can_create_code(): void
     {
+        Bus::fake();
+
         $user = createUser();
 
         $this->signInAdmin($user)
@@ -71,6 +77,8 @@ class CodeControllerTest extends TestCase
     /** @test */
     public function authorized_user_can_create_code(): void
     {
+        Bus::fake();
+
         $user = createUser();
 
         $this->signIn($user, 'create_codes')
@@ -85,6 +93,8 @@ class CodeControllerTest extends TestCase
     /** @test */
     public function unauthorized_user_cannot_create_code(): void
     {
+        Bus::fake();
+
         $this->signIn()
             ->post(route('credits.code.create'), ['value' => 200])
             ->assertStatus(403);
@@ -95,6 +105,8 @@ class CodeControllerTest extends TestCase
     /** @test */
     public function guest_cannot_create_code(): void
     {
+        Bus::fake();
+
         $this->post(route('credits.code.create'), ['value' => 200])
             ->assertStatus(500);
 
@@ -229,12 +241,5 @@ class CodeControllerTest extends TestCase
             'code' => $code->code,
             'used_by' => null
         ]);
-    }
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        Bus::fake();
     }
 }

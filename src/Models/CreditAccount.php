@@ -48,9 +48,14 @@ class CreditAccount extends Model
         AccountAggregate::retrieve($this->uuid)->disableAccount()->persist();
     }
 
-    public function transferCredits($targetUuid, $amount): void
+    public function transferCredits($targetUuid, $amount, $referenceUuid): void
     {
-        AccountAggregate::retrieve($this->uuid)->transferCredits($targetUuid, $amount)->persist();
+        AccountAggregate::retrieve($this->uuid)->transferCredits($targetUuid, $amount, $referenceUuid)->persist();
+    }
+
+    public function receiveCredits($sourceUuid, $amount, $referenceUuid): void
+    {
+        AccountAggregate::retrieve($this->uuid)->receiveCredits($sourceUuid, $amount, $referenceUuid)->persist();
     }
 
     public function owner(): MorphTo

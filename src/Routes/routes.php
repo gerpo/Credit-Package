@@ -1,10 +1,12 @@
 <?php
 
 
+use Gerpo\DmsCredits\Controllers\CreditsTransferController;
+
 Route::group(['middleware' => ['web', 'auth', 'can:have_credits']], function () {
     Route::get('credits', 'Gerpo\DmsCredits\Controllers\AccountController@index')->name('credits.index');
 
-    Route::post('/credits/purchase', 'Gerpo\DmsCredits\Controllers\PurchaseController@store');
+    Route::post('/credits/transfer', CreditsTransferController::class)->name('credits.transfer');
 
     Route::get('/credits/code',
         'Gerpo\DmsCredits\Controllers\CodeController@index')->name('credits.code.index')->middleware('can:create_codes');

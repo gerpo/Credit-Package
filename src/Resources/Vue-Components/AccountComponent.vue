@@ -4,6 +4,7 @@
             <p>{{ $tv('DmsCredits.account.balance_long') }}</p>
             <div class="balance">{{ workingAccount.balance }}</div>
         </div>
+        <transfer-Credits-component class="ml-auto mr-2 ml-auto mr-2"></transfer-Credits-component>
         <purchase-component v-on:purchase-success="refetchAccount"/>
         <hr class="w-100">
         <account-transactions :transactions="workingAccount.transactions" class="w-100"/>
@@ -12,11 +13,13 @@
 
 <script>
     import AccountTransactions from './AccountTransactionsComponent.vue';
+    import TransferCreditsComponent from './TransferCreditsComponent';
     import PurchaseComponent from './PurchaseComponent.vue';
 
     export default {
         name: "account-component",
         components: {
+            TransferCreditsComponent,
             PurchaseComponent,
             AccountTransactions,
         },

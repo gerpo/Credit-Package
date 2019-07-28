@@ -6,12 +6,12 @@ use Gerpo\DmsCredits\Events\AccountCreated;
 use Gerpo\DmsCredits\Events\AccountDisabled;
 use Gerpo\DmsCredits\Events\AccountEnabled;
 use Gerpo\DmsCredits\Events\CreditsAdded;
+use Gerpo\DmsCredits\Events\CreditsReceived;
 use Gerpo\DmsCredits\Events\CreditsSubtracted;
 use Gerpo\DmsCredits\Events\CreditsTransferred;
 use Gerpo\DmsCredits\Exceptions\CouldNotSubtractCredits;
 use Gerpo\DmsCredits\Exceptions\CouldNotTransferCredits;
 use Gerpo\DmsCredits\Models\CreditAccount;
-use Illuminate\Foundation\Bus\Dispatchable;
 use Spatie\EventProjector\AggregateRoot;
 
 class AccountAggregate extends AggregateRoot
@@ -27,6 +27,16 @@ class AccountAggregate extends AggregateRoot
     public function applyCreditsSubtracted(CreditsSubtracted $event): void
     {
         $this->balance -= $event->amount;
+    }
+
+    public function applyCreditsTransferred(CreditsTransferred $event): void
+    {
+        $this->balance -= $event->amount;
+    }
+
+    public function applyCreditsReceived(CreditsReceived $event): void
+    {
+        $this->balance += $event->amount;
     }
 
     public function applyAccountEnabled(AccountEnabled $event): void
@@ -78,8 +88,17 @@ class AccountAggregate extends AggregateRoot
         return $this;
     }
 
-    public function transferCredits(string $targetUuid, int $amount, $message = null): AccountAggregate
+    private function hasSufficientFundsToSubtractAmount(int $amount): bool
     {
+        return ($this->balance - $amount) >= config('dmscredit.minimum_balance', 0);
+    }
+
+    public function transferCredits(
+        string $targetUuid,
+        int $amount,
+        string $referenceUuid,
+        $message = null
+    ): AccountAggregate {
         if (!$this->hasSufficientFundsToSubtractAmount($amount)) {
             throw CouldNotTransferCredits::notEnoughCredits($amount);
         }
@@ -88,13 +107,19 @@ class AccountAggregate extends AggregateRoot
             throw CouldNotTransferCredits::targetDoesNotExist();
         }
 
-        $this->recordThat(new CreditsTransferred($targetUuid, $amount, $message));
+        $this->recordThat(new CreditsTransferred($targetUuid, $amount, $referenceUuid, $message));
 
         return $this;
     }
 
-    private function hasSufficientFundsToSubtractAmount(int $amount): bool
-    {
-        return ($this->balance - $amount) >= config('dmscredit.minimum_balance', 0);
+    public function receiveCredits(
+        string $sourceUuid,
+        int $amount,
+        string $referenceUuid,
+        $message = null
+    ): AccountAggregate {
+        $this->recordThat(new CreditsReceived($sourceUuid, $amount, $referenceUuid, $message));
+
+        return $this;
     }
 }

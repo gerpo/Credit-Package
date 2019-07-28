@@ -8,9 +8,6 @@ use Spatie\EventProjector\ShouldBeStored;
 
 class CreditsSubtracted implements ShouldBeStored
 {
-    /** @var string */
-    public $accountUuid;
-
     /** @var int */
     public $amount;
 

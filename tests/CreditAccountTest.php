@@ -84,22 +84,9 @@ class CreditAccountTest extends TestCase
 
         $target = createAccount();
 
-        $account->transferCredits($target->uuid, 200);
+        $account->transferCredits($target->uuid, 200, 'referenceUuid');
 
         $this->assertEquals(0, $account->fresh()->balance);
-    }
-
-    /** @test */
-    public function transferCredits_adds_correct_amount_to_target(): void
-    {
-        $account = createAccount();
-        $account->addCredits(200);
-
-        $target = createAccount();
-
-        $account->transferCredits($target->uuid, 200);
-
-        $this->assertEquals(200, $target->fresh()->balance);
     }
 
     /** @test */
@@ -111,7 +98,7 @@ class CreditAccountTest extends TestCase
         $this->expectException(CouldNotTransferCredits::class);
         $this->expectExceptionMessage(CouldNotTransferCredits::notEnoughCredits(200)->getMessage());
 
-        $account->transferCredits($target->uuid, 200);
+        $account->transferCredits($target->uuid, 200, 'referenceUuid');
 
         $this->assertEquals(0, $account->fresh()->balance);
         $this->assertEquals(0, $target->fresh()->balance);
@@ -126,8 +113,21 @@ class CreditAccountTest extends TestCase
         $this->expectException(CouldNotTransferCredits::class);
         $this->expectExceptionMessage(CouldNotTransferCredits::targetDoesNotExist()->getMessage());
 
-        $account->transferCredits('INVALID_UUID', 200);
+        $account->transferCredits('INVALID_UUID', 200, 'referenceUuid');
 
         $this->assertEquals(0, $account->fresh()->balance);
+    }
+
+    /** @test */
+    public function receiveCredits_adds_correct_amount_to_target(): void
+    {
+        $account = createAccount();
+        $account->addCredits(200);
+
+        $target = createAccount();
+
+        $target->receiveCredits($account->uuid, 200, 'referenceUuid');
+
+        $this->assertEquals(200, $target->fresh()->balance);
     }
 }

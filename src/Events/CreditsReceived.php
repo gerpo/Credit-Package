@@ -6,10 +6,10 @@ namespace Gerpo\DmsCredits\Events;
 
 use Spatie\EventProjector\ShouldBeStored;
 
-class CreditsTransferred implements ShouldBeStored
+class CreditsReceived implements ShouldBeStored
 {
     /** @var string */
-    public $targetUuid;
+    public $sourceUuid;
 
     /** @var int */
     public $amount;
@@ -20,11 +20,11 @@ class CreditsTransferred implements ShouldBeStored
     /** @var string */
     public $message;
 
-    public function __construct(string $targetUuid, int $amount, string $referenceUuid, string $message = null)
+    public function __construct(string $sourceUuid, int $amount, string $referenceUuid,  string $message = null)
     {
-        $this->targetUuid = $targetUuid;
+        $this->sourceUuid = $sourceUuid;
         $this->amount = $amount;
         $this->referenceUuid = $referenceUuid;
-        $this->message = $message ?? 'DmsCredits::account.credits_transferred';
+        $this->message = $message ?? 'DmsCredits::account.credits_received';
     }
 }

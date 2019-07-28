@@ -6,10 +6,10 @@ use Gerpo\DmsCredits\Events\AccountCreated;
 use Gerpo\DmsCredits\Events\AccountDisabled;
 use Gerpo\DmsCredits\Events\AccountEnabled;
 use Gerpo\DmsCredits\Models\CreditAccount;
-use Spatie\EventProjector\Projectors\Projector;
 use Spatie\EventProjector\Projectors\ProjectsEvents;
+use Spatie\EventProjector\Projectors\QueuedProjector;
 
-class AccountProjector implements Projector
+class AccountProjector implements QueuedProjector
 {
     use ProjectsEvents;
 
@@ -30,7 +30,7 @@ class AccountProjector implements Projector
             'uuid' => $aggregateUuid,
             'owner_id' => $event->accountAttributes['owner_id'],
             'owner_type' => $event->accountAttributes['owner_type'],
-            ]);
+        ]);
     }
 
     public function onAccountEnabled(AccountEnabled $event, string $aggregateUuid): void

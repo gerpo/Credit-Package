@@ -3,13 +3,14 @@
 namespace Gerpo\DmsCredits\Projectors;
 
 use Gerpo\DmsCredits\Events\CreditsAdded;
+use Gerpo\DmsCredits\Events\CreditsReceived;
 use Gerpo\DmsCredits\Events\CreditsSubtracted;
 use Gerpo\DmsCredits\Events\CreditsTransferred;
 use Gerpo\DmsCredits\Models\CreditAccount;
-use Spatie\EventProjector\Projectors\Projector;
 use Spatie\EventProjector\Projectors\ProjectsEvents;
+use Spatie\EventProjector\Projectors\QueuedProjector;
 
-class AccountBalanceProjector implements Projector
+class AccountBalanceProjector implements QueuedProjector
 {
     use ProjectsEvents;
 
@@ -17,6 +18,7 @@ class AccountBalanceProjector implements Projector
         CreditsAdded::class => 'onCreditsAdded',
         CreditsSubtracted::class => 'onCreditsSubtracted',
         CreditsTransferred::class => 'onCreditsTransferred',
+        CreditsReceived::class => 'onCreditsReceived',
     ];
 
     public function onCreditsAdded(CreditsAdded $event, string $aggregateUuid): void
@@ -37,13 +39,18 @@ class AccountBalanceProjector implements Projector
 
     public function onCreditsTransferred(CreditsTransferred $event, string $aggregateUuid): void
     {
-        $source = CreditAccount::uuid($aggregateUuid);
-        $target = CreditAccount::uuid($event->targetUuid);
+        $account = CreditAccount::uuid($aggregateUuid);
 
-        $source->balance -= $event->amount;
-        $target->balance += $event->amount;
+        $account->balance -= $event->amount;
 
-        $source->save();
-        $target->save();
+        $account->save();
+    }
+
+    public function onCreditsReceived(CreditsReceived $event, string $aggregateUuid): void
+    {
+        $account = CreditAccount::uuid($aggregateUuid);
+
+        $account->balance += $event->amount;
+        $account->save();
     }
 }

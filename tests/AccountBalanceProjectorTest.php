@@ -4,6 +4,7 @@ namespace DmsCredits\Tests;
 
 use Gerpo\DmsCredits\Aggregates\AccountAggregate;
 use Gerpo\DmsCredits\Events\CreditsAdded;
+use Gerpo\DmsCredits\Events\CreditsReceived;
 use Gerpo\DmsCredits\Events\CreditsSubtracted;
 use Gerpo\DmsCredits\Events\CreditsTransferred;
 use Gerpo\DmsCredits\Projectors\AccountBalanceProjector;
@@ -72,13 +73,13 @@ class AccountBalanceProjectorTest extends TestCase
 
         $this->assertEquals(200, $source->fresh()->balance);
 
-        (new AccountBalanceProjector)->onCreditsTransferred(new CreditsTransferred($target->uuid, 200), $source->uuid);
+        (new AccountBalanceProjector)->onCreditsTransferred(new CreditsTransferred($target->uuid, 200, 'referenceUuid'), $source->uuid);
 
         $this->assertEquals(0, $source->fresh()->balance);
     }
 
     /** @test */
-    public function onCreditsTransferred_adds_right_amount_to_target(): void
+    public function onCreditsReceived_adds_right_amount_to_target(): void
     {
         $source = createAccount();
         $source->addCredits(200);
@@ -87,7 +88,7 @@ class AccountBalanceProjectorTest extends TestCase
 
         $this->assertEquals(0, $target->balance);
 
-        (new AccountBalanceProjector)->onCreditsTransferred(new CreditsTransferred($target->uuid, 200), $source->uuid);
+        (new AccountBalanceProjector)->onCreditsReceived(new CreditsReceived($source->uuid, 200, 'referenceUuid'), $target->uuid);
 
         $this->assertEquals(200, $target->fresh()->balance);
     }

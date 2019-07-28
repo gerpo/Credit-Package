@@ -4,6 +4,7 @@
 namespace Gerpo\DmsCredits\Resources;
 
 
+use Gerpo\DmsCredits\Models\CreditAccount;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class Transaction extends JsonResource
@@ -37,6 +38,20 @@ class Transaction extends JsonResource
                 'event_name' => $eventName,
                 'message' => $this->event_properties['message'],
                 'amount' => -$this->event_properties['amount'],
+                'created_at' => $this->created_at,
+            ];
+            case 'CreditsTransferred': return [
+                'event_name' => $eventName,
+                'message' => $this->event_properties['message'],
+                'amount' => -$this->event_properties['amount'],
+                'target' => CreditAccount::uuid($this->event_properties['targetUuid'])->owner->username,
+                'created_at' => $this->created_at,
+            ];
+            case 'CreditsReceived': return [
+                'event_name' => $eventName,
+                'message' => $this->event_properties['message'],
+                'amount' => $this->event_properties['amount'],
+                'source' => CreditAccount::uuid($this->event_properties['sourceUuid'])->owner->username,
                 'created_at' => $this->created_at,
             ];
             default: return [];
