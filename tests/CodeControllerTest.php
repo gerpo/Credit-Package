@@ -1,10 +1,7 @@
 <?php
 
-
 use DmsCredits\Tests\TestCase;
-use Gerpo\DmsCredits\Events\CreditsAdded;
 use Gerpo\DmsCredits\Jobs\GenerateCode;
-use Illuminate\Support\Arr;
 
 class CodeControllerTest extends TestCase
 {
@@ -38,7 +35,7 @@ class CodeControllerTest extends TestCase
             ->assertSuccessful();
 
         Bus::assertDispatched(GenerateCode::class, function ($job) use ($user) {
-            return ($job->value === 200 && $job->amount === 1 && $job->user === $user);
+            return $job->value === 200 && $job->amount === 1 && $job->user === $user;
         });
     }
 
@@ -54,7 +51,7 @@ class CodeControllerTest extends TestCase
             ->assertSuccessful();
 
         Bus::assertDispatched(GenerateCode::class, function ($job) use ($user) {
-            return ($job->value === 200 && $job->amount === 20 && $job->user === $user);
+            return $job->value === 200 && $job->amount === 20 && $job->user === $user;
         });
     }
 
@@ -70,7 +67,7 @@ class CodeControllerTest extends TestCase
             ->assertSuccessful();
 
         Bus::assertDispatched(GenerateCode::class, function ($job) use ($user) {
-            return ($job->value === 200 && $job->amount === 1 && $job->user === $user);
+            return $job->value === 200 && $job->amount === 1 && $job->user === $user;
         });
     }
 
@@ -86,7 +83,7 @@ class CodeControllerTest extends TestCase
             ->assertSuccessful();
 
         Bus::assertDispatched(GenerateCode::class, function ($job) use ($user) {
-            return ($job->value === 200 && $job->amount === 1 && $job->user === $user);
+            return $job->value === 200 && $job->amount === 1 && $job->user === $user;
         });
     }
 
@@ -125,7 +122,7 @@ class CodeControllerTest extends TestCase
             ->assertSuccessful();
 
         $this->assertDatabaseHas('codes', [
-            'code' => $code->code,
+            'code'    => $code->code,
             'used_by' => $user->id,
         ]);
 
@@ -145,7 +142,7 @@ class CodeControllerTest extends TestCase
             ->assertSuccessful();
 
         $this->assertDatabaseHas('codes', [
-            'code' => $code->code,
+            'code'    => $code->code,
             'used_by' => $user->id,
         ]);
 
@@ -164,12 +161,12 @@ class CodeControllerTest extends TestCase
             ->assertStatus(302);
 
         $this->assertDatabaseHas('codes', [
-            'code' => $code->code,
+            'code'    => $code->code,
             'used_by' => null,
         ]);
 
         $this->assertDatabaseMissing('codes', [
-            'code' => 'abcdef',
+            'code'    => 'abcdef',
             'used_by' => $user->id,
         ]);
 
@@ -190,7 +187,7 @@ class CodeControllerTest extends TestCase
             ->assertSuccessful();
 
         $this->assertDatabaseHas('codes', [
-            'code' => $code->code,
+            'code'    => $code->code,
             'used_by' => $user->id,
         ]);
         $this->assertEquals(200, $user->creditAccount->fresh()->balance);
@@ -199,7 +196,7 @@ class CodeControllerTest extends TestCase
             ->assertStatus(302);
 
         $this->assertDatabaseMissing('codes', [
-            'code' => $code->code,
+            'code'    => $code->code,
             'used_by' => $user2->id,
         ]);
 
@@ -219,7 +216,7 @@ class CodeControllerTest extends TestCase
             ->assertSuccessful();
 
         $this->assertDatabaseHas('codes', [
-            'code' => $code->code,
+            'code'    => $code->code,
             'used_by' => $user->id,
         ]);
 
@@ -238,8 +235,8 @@ class CodeControllerTest extends TestCase
             ->assertStatus(500);
 
         $this->assertDatabaseHas('codes', [
-            'code' => $code->code,
-            'used_by' => null
+            'code'    => $code->code,
+            'used_by' => null,
         ]);
     }
 }

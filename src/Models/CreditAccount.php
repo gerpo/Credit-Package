@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Gerpo\DmsCredits\Models;
-
 
 use Gerpo\DmsCredits\Aggregates\AccountAggregate;
 use Gerpo\DmsCredits\Resources\Transaction;
@@ -17,7 +15,7 @@ class CreditAccount extends Model
     protected $hidden = [
         'id',
         'owner_id',
-        'owner_type'
+        'owner_type',
     ];
     protected $casts = [
         'is_active' => 'boolean',

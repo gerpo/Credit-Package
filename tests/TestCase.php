@@ -42,9 +42,9 @@ class TestCase extends \Orchestra\Testbench\TestCase
 
         $app['config']->set('database.default', 'testbench');
         $app['config']->set('database.connections.testbench', [
-            'driver' => 'mysql',
+            'driver'   => 'mysql',
             'database' => 'credits_test',
-            'host' => '127.0.0.1',
+            'host'     => '127.0.0.1',
             'username' => 'travis',
             'password' => '',
         ]);
@@ -53,17 +53,20 @@ class TestCase extends \Orchestra\Testbench\TestCase
         $app['config']->set('auth.providers.users.model', User::class);
     }
 
-
     protected function setUp(): void
     {
         parent::setUp();
         $this->removeOldMigrations();
 
-        $this->artisan('vendor:publish',
-            ['--provider' => EventProjectorServiceProvider::class,]);
+        $this->artisan(
+            'vendor:publish',
+            ['--provider' => EventProjectorServiceProvider::class]
+        );
 
-        $this->artisan('vendor:publish',
-            ['--provider' => BouncerServiceProvider::class,]);
+        $this->artisan(
+            'vendor:publish',
+            ['--provider' => BouncerServiceProvider::class]
+        );
 
         $this->migrate();
         Bouncer::make()->create()->allow('admin')->everything();
@@ -71,7 +74,7 @@ class TestCase extends \Orchestra\Testbench\TestCase
 
     private function removeOldMigrations(): void
     {
-        $files = glob(realpath(__DIR__ . '/../vendor/orchestra/testbench-core/laravel/database/migrations') . '/*.php');
+        $files = glob(realpath(__DIR__.'/../vendor/orchestra/testbench-core/laravel/database/migrations').'/*.php');
 
         foreach ($files as $file) {
             if (is_file($file)) {

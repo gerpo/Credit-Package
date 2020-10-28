@@ -14,8 +14,8 @@ class AccountProjector implements QueuedProjector
     use ProjectsEvents;
 
     protected $handlesEvents = [
-        AccountCreated::class => 'onAccountCreated',
-        AccountEnabled::class => 'onAccountEnabled',
+        AccountCreated::class  => 'onAccountCreated',
+        AccountEnabled::class  => 'onAccountEnabled',
         AccountDisabled::class => 'onAccountDisabled',
     ];
 
@@ -27,8 +27,8 @@ class AccountProjector implements QueuedProjector
     public function onAccountCreated(AccountCreated $event, string $aggregateUuid): void
     {
         CreditAccount::create([
-            'uuid' => $aggregateUuid,
-            'owner_id' => $event->accountAttributes['owner_id'],
+            'uuid'       => $aggregateUuid,
+            'owner_id'   => $event->accountAttributes['owner_id'],
             'owner_type' => $event->accountAttributes['owner_type'],
         ]);
     }

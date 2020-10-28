@@ -1,8 +1,6 @@
 <?php
 
-
 namespace DmsCredits\Tests;
-
 
 use Gerpo\DmsCredits\Aggregates\AccountAggregate;
 use Gerpo\DmsCredits\Events\AccountCreated;
@@ -17,14 +15,14 @@ class AccountProjectorTest extends TestCase
     public function onAccountCreated_creates_model_entity_with_uuid(): void
     {
         $user = User::create();
-        $uuid = (string)Uuid::uuid4();
+        $uuid = (string) Uuid::uuid4();
 
         $attr = [
-            'owner_id' => $user->id,
-            'owner_type' => User::class
+            'owner_id'   => $user->id,
+            'owner_type' => User::class,
         ];
 
-        (new AccountProjector)->onAccountCreated(new AccountCreated($attr), $uuid);
+        (new AccountProjector())->onAccountCreated(new AccountCreated($attr), $uuid);
 
         $this->assertDatabaseHas('credit_accounts', ['uuid' => $uuid, 'owner_id' => $attr['owner_id']]);
     }
@@ -36,7 +34,7 @@ class AccountProjectorTest extends TestCase
 
         $this->assertFalse($account->is_active);
 
-        (new AccountProjector)->onAccountEnabled(new AccountEnabled(), $account->uuid);
+        (new AccountProjector())->onAccountEnabled(new AccountEnabled(), $account->uuid);
         //AccountAggregate::retrieve($account->uuid)->enableAccount()->persist();
 
         $this->assertTrue($account->fresh()->is_active);
@@ -49,7 +47,7 @@ class AccountProjectorTest extends TestCase
 
         $this->assertTrue($account->is_active);
 
-        (new AccountProjector)->onAccountDisabled(new AccountDisabled(), $account->uuid);
+        (new AccountProjector())->onAccountDisabled(new AccountDisabled(), $account->uuid);
         //AccountAggregate::retrieve($account->uuid)->disableAccount()->persist();
 
         $this->assertFalse($account->fresh()->is_active);

@@ -12,7 +12,10 @@ use Illuminate\Queue\SerializesModels;
 
 class GenerateCode implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable;
+    use InteractsWithQueue;
+    use Queueable;
+    use SerializesModels;
 
     /**
      * @var int
@@ -31,8 +34,8 @@ class GenerateCode implements ShouldQueue
      * Create a new job instance.
      *
      * @param User $user
-     * @param int $value
-     * @param int $amount
+     * @param int  $value
+     * @param int  $amount
      */
     public function __construct(User $user, int $value, int $amount = 1)
     {
@@ -45,6 +48,7 @@ class GenerateCode implements ShouldQueue
      * Execute the job.
      *
      * @param CodeGenerator $generator
+     *
      * @return void
      */
     public function handle(CodeGenerator $generator): void

@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Gerpo\DmsCredits\Models;
-
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -14,7 +12,7 @@ class Code extends Model
     protected $dates = [
         'created_at',
         'updated_at',
-        'used_at'
+        'used_at',
     ];
 
     protected static function boot(): void

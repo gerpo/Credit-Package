@@ -15,10 +15,10 @@ class AccountBalanceProjector implements QueuedProjector
     use ProjectsEvents;
 
     public $handlesEvents = [
-        CreditsAdded::class => 'onCreditsAdded',
-        CreditsSubtracted::class => 'onCreditsSubtracted',
+        CreditsAdded::class       => 'onCreditsAdded',
+        CreditsSubtracted::class  => 'onCreditsSubtracted',
         CreditsTransferred::class => 'onCreditsTransferred',
-        CreditsReceived::class => 'onCreditsReceived',
+        CreditsReceived::class    => 'onCreditsReceived',
     ];
 
     public function onCreditsAdded(CreditsAdded $event, string $aggregateUuid): void

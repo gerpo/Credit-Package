@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Gerpo\DmsCredits\Events;
-
 
 use Spatie\EventProjector\ShouldBeStored;
 
@@ -20,7 +18,7 @@ class CreditsReceived implements ShouldBeStored
     /** @var string */
     public $message;
 
-    public function __construct(string $sourceUuid, int $amount, string $referenceUuid,  string $message = null)
+    public function __construct(string $sourceUuid, int $amount, string $referenceUuid, string $message = null)
     {
         $this->sourceUuid = $sourceUuid;
         $this->amount = $amount;

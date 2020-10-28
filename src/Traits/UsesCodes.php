@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Gerpo\DmsCredits\Traits;
-
 
 use Gerpo\DmsCredits\Aggregates\AccountAggregate;
 use Gerpo\DmsCredits\Models\Code;

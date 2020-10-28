@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Gerpo\DmsCredits;
-
 
 use Exception;
 use Gerpo\DmsCredits\Models\Code;
@@ -30,7 +28,7 @@ class CodeGenerator
         $this->currentCodes = Code::all('code');
 
         $this->codeLength = config('DmsCredit.code_length', 8);
-        $this->codeChars  = config('DmsCredit.code_chars', '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ');
+        $this->codeChars = config('DmsCredit.code_chars', '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ');
     }
 
     public function generateCodes(User $creator, int $value, int $amount = 1)
@@ -47,7 +45,7 @@ class CodeGenerator
     {
         $code = Code::make([
             'value' => $value,
-            'code' => $this->generateUniqueCode()
+            'code'  => $this->generateUniqueCode(),
         ]);
 
         while (!$creator->createdCodes()->save($code)) {
@@ -59,8 +57,10 @@ class CodeGenerator
 
     /**
      * @param int $length
-     * @return string
+     *
      * @throws Exception
+     *
+     * @return string
      */
     public function generateUniqueCode(int $length = null): string
     {
@@ -78,6 +78,7 @@ class CodeGenerator
             return $this->generateUniqueCode($length);
         }
         $this->currentCodes->push($res);
+
         return $res;
     }
 
@@ -85,6 +86,4 @@ class CodeGenerator
     {
         return !$this->currentCodes->contains('code', $code);
     }
-
-
 }

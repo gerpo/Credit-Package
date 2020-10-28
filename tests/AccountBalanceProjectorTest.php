@@ -19,7 +19,7 @@ class AccountBalanceProjectorTest extends TestCase
 
         $this->assertEquals(0, $account->balance);
 
-        (new AccountBalanceProjector)->onCreditsAdded(new CreditsAdded(200), $account->uuid);
+        (new AccountBalanceProjector())->onCreditsAdded(new CreditsAdded(200), $account->uuid);
 
         $this->assertEquals(200, $account->fresh()->balance);
     }
@@ -31,7 +31,7 @@ class AccountBalanceProjectorTest extends TestCase
 
         $this->assertEquals(200, $account->balance);
 
-        (new AccountBalanceProjector)->onCreditsSubtracted(new CreditsSubtracted(200), $account->uuid);
+        (new AccountBalanceProjector())->onCreditsSubtracted(new CreditsSubtracted(200), $account->uuid);
 
         $this->assertEquals(0, $account->fresh()->balance);
     }
@@ -73,7 +73,7 @@ class AccountBalanceProjectorTest extends TestCase
 
         $this->assertEquals(200, $source->fresh()->balance);
 
-        (new AccountBalanceProjector)->onCreditsTransferred(new CreditsTransferred($target->uuid, 200, 'referenceUuid'), $source->uuid);
+        (new AccountBalanceProjector())->onCreditsTransferred(new CreditsTransferred($target->uuid, 200, 'referenceUuid'), $source->uuid);
 
         $this->assertEquals(0, $source->fresh()->balance);
     }
@@ -88,7 +88,7 @@ class AccountBalanceProjectorTest extends TestCase
 
         $this->assertEquals(0, $target->balance);
 
-        (new AccountBalanceProjector)->onCreditsReceived(new CreditsReceived($source->uuid, 200, 'referenceUuid'), $target->uuid);
+        (new AccountBalanceProjector())->onCreditsReceived(new CreditsReceived($source->uuid, 200, 'referenceUuid'), $target->uuid);
 
         $this->assertEquals(200, $target->fresh()->balance);
     }
