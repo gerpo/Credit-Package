@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Gerpo\DmsCredits\Controllers;
-
 
 use Gerpo\DmsCredits\Jobs\GenerateCode;
 use Gerpo\DmsCredits\Models\Code;
@@ -35,7 +33,7 @@ class CodeController extends Controller
     {
         $data = $request->validate([
             'amount' => 'integer',
-            'value' => 'required|integer'
+            'value'  => 'required|integer',
         ]);
 
         $user = $request->user();
@@ -50,8 +48,8 @@ class CodeController extends Controller
             'code' => [
                 'required',
                 'string',
-                new CodeExists()
-            ]
+                new CodeExists(),
+            ],
         ]);
 
         $user = request()->user();

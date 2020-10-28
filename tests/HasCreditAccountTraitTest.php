@@ -2,7 +2,6 @@
 
 namespace DmsCredits\Tests;
 
-
 class HasCreditAccountTraitTest extends TestCase
 {
     /** @test */

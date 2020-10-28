@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Gerpo\DmsCredits\Controllers;
-
 
 use Carbon\Carbon;
 use DB;
@@ -12,13 +10,12 @@ use Illuminate\Routing\Controller;
 
 class CreditStatisticsController extends Controller
 {
-
     public function index(Request $request)
     {
         $data = $request->validate([
-            'type' => 'nullable|sometimes|in:daily,monthly',
+            'type'            => 'nullable|sometimes|in:daily,monthly',
             'start_timestamp' => 'date',
-            'end_timestamp' => 'date',
+            'end_timestamp'   => 'date',
         ]);
 
         $data['type'] = $data['type'] ?? 'monthly';
@@ -57,7 +54,8 @@ class CreditStatisticsController extends Controller
             DB::raw('count(id) as created_codes'),
             DB::raw('convert(sum(value), UNSIGNED) as created_value'),
             DB::raw('count(used_at) as used_codes'),
-            DB::raw('convert(sum(if(used_at IS NOT NULL, value, 0)), UNSIGNED) as used_value'));
+            DB::raw('convert(sum(if(used_at IS NOT NULL, value, 0)), UNSIGNED) as used_value')
+        );
     }
 
     private function getMonthlyStatistics($data)

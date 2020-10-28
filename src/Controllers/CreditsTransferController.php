@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Gerpo\DmsCredits\Controllers;
-
 
 use Gerpo\DmsCredits\Aggregates\AccountAggregate;
 use Gerpo\DmsCredits\Exceptions\CouldNotTransferCredits;
@@ -16,14 +14,14 @@ class CreditsTransferController
     {
         $data = $request->validate([
             'target' => 'required|string|exists:users,username',
-            'amount' => 'required|integer'
+            'amount' => 'required|integer',
         ]);
 
         $userClass = config('auth.providers.users.model');
         $target = (new $userClass())->where('username', $data['target'])->first();
 
         try {
-            $referenceUuid = (string)Uuid::uuid4();
+            $referenceUuid = (string) Uuid::uuid4();
             $request->user()
                 ->creditAccount
                 ->transferCredits($target->creditAccount->uuid, $data['amount'], $referenceUuid);
@@ -35,6 +33,7 @@ class CreditsTransferController
             $error = ValidationException::withMessages([
                 'amount' => [$exception->getMessage()],
             ]);
+
             throw $error;
         }
     }

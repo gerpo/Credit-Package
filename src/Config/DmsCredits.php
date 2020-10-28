@@ -13,4 +13,3 @@ return [
     /** The characters used for generating credit codes. */
     'code_chars' => '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ',
 ];
-

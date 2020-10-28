@@ -21,38 +21,38 @@ class CreditStatisticsControllerTest extends TestCase
     {
         return array_merge([
             'start_timestamp' => Carbon::today()->subYear(),
-            'end_timestamp' => Carbon::today()->addDay(),
-            'type' => 'monthly',
-            'period_data' => [
+            'end_timestamp'   => Carbon::today()->addDay(),
+            'type'            => 'monthly',
+            'period_data'     => [
                 Carbon::today()->format('m.y') => [
                     'created_codes' => 1,
                     'created_value' => 500,
-                    'used_codes' => 0,
-                    'used_value' => 0,
-                    'month' => Carbon::today()->format('m.y'),
-                ]
+                    'used_codes'    => 0,
+                    'used_value'    => 0,
+                    'month'         => Carbon::today()->format('m.y'),
+                ],
             ],
             'total_data' => [
                 'created_codes' => 1,
                 'created_value' => 500,
-                'used_codes' => 0,
-                'used_value' => 0,
+                'used_codes'    => 0,
+                'used_value'    => 0,
             ],
             'creator_data' => [
                 [
                     'created_codes' => 1,
                     'created_value' => 500,
-                    'used_codes' => 0,
-                    'used_value' => 0,
-                    'created_by' => 2,
-                    'creator' => [
-                        'id' => 2,
+                    'used_codes'    => 0,
+                    'used_value'    => 0,
+                    'created_by'    => 2,
+                    'creator'       => [
+                        'id'        => 2,
                         'firstname' => null,
-                        'lastname' => null,
-                        'username' => null,
-                    ]
-                ]
-            ]
+                        'lastname'  => null,
+                        'username'  => null,
+                    ],
+                ],
+            ],
         ], $overwrites);
     }
 

@@ -1,6 +1,5 @@
 <?php
 
-
 use DmsCredits\Tests\TestCase;
 use Gerpo\DmsCredits\CodeGenerator;
 use Gerpo\DmsCredits\Models\Code;
@@ -18,7 +17,7 @@ class CodeGeneratorTest extends TestCase
         $generator->generateCode($user, $value);
 
         $this->assertDatabaseHas('codes', [
-            'value' => $value
+            'value' => $value,
         ]);
 
         $this->assertCount(1, Code::all());
@@ -36,7 +35,7 @@ class CodeGeneratorTest extends TestCase
         $generator->generateCodes($user, $value, $amount);
 
         $this->assertDatabaseHas('codes', [
-            'value' => $value
+            'value' => $value,
         ]);
 
         $this->assertCount($amount, Code::all());
@@ -59,7 +58,7 @@ class CodeGeneratorTest extends TestCase
         $generator->generateCodes($user, $value, $amount);
 
         $this->assertDatabaseHas('codes', [
-            'value' => $value
+            'value' => $value,
         ]);
 
         $this->assertCount($amount, Code::all());

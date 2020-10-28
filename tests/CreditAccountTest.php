@@ -1,16 +1,9 @@
 <?php
 
-
 namespace DmsCredits\Tests;
 
-
-use Gerpo\DmsCredits\Events\AccountDisabled;
-use Gerpo\DmsCredits\Events\AccountEnabled;
-use Gerpo\DmsCredits\Events\CreditsSubtracted;
-use Gerpo\DmsCredits\Events\CreditsTransferred;
 use Gerpo\DmsCredits\Exceptions\CouldNotSubtractCredits;
 use Gerpo\DmsCredits\Exceptions\CouldNotTransferCredits;
-use Illuminate\Support\Facades\Event;
 
 class CreditAccountTest extends TestCase
 {

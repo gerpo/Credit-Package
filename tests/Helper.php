@@ -2,7 +2,6 @@
 
 use DmsCredits\Tests\User;
 use Gerpo\DmsCredits\CodeGenerator;
-use Gerpo\DmsCredits\Models\CreditAccount;
 
 function createAccount(array $attributes = [], $user = null)
 {
@@ -13,7 +12,7 @@ function createAccount(array $attributes = [], $user = null)
 
 function createUser()
 {
-    return tap(User::create(), function($user) {
+    return tap(User::create(), function ($user) {
         $user->allow('have_credits');
     });
 }
@@ -22,5 +21,6 @@ function createCode(int $value = 500, $user = null)
 {
     $creator = $user ?? createUser();
     $generator = new CodeGenerator();
+
     return $generator->generateCode($creator, $value);
 }

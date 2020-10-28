@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Gerpo\DmsCredits\Controllers;
 
 use Illuminate\Routing\Controller;

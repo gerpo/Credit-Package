@@ -8,7 +8,6 @@ use Ramsey\Uuid\Uuid;
 
 trait HasCreditAccount
 {
-
     protected static $creditAccountClass = CreditAccount::class;
     protected static $morphFieldName = 'owner';
 
@@ -17,10 +16,10 @@ trait HasCreditAccount
         $account = $this->morphOne(static::$creditAccountClass, static::$morphFieldName);
 
         if ($account->get()->isEmpty()) {
-            $newUuid = (string)Uuid::uuid4();
+            $newUuid = (string) Uuid::uuid4();
             AccountAggregate::retrieve($newUuid)
                 ->createAccount([
-                    'owner_id' => $this->id,
+                    'owner_id'   => $this->id,
                     'owner_type' => __CLASS__,
                 ])
                 ->persist();
@@ -29,4 +28,3 @@ trait HasCreditAccount
         return $this->morphOne(static::$creditAccountClass, static::$morphFieldName);
     }
 }
-

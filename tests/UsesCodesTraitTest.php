@@ -1,9 +1,7 @@
 <?php
 
-
 use DmsCredits\Tests\TestCase;
 use Gerpo\DmsCredits\Events\CreditsAdded;
-use Illuminate\Database\Eloquent\Model;
 use Spatie\EventProjector\Models\StoredEvent;
 
 class UsesCodesTraitTest extends TestCase
@@ -55,8 +53,8 @@ class UsesCodesTraitTest extends TestCase
             ->assertSuccessful();
 
         $this->assertDatabaseHas('codes', [
-            'value' => $value,
-            'created_by' => $user->id
+            'value'      => $value,
+            'created_by' => $user->id,
         ]);
     }
 
@@ -79,7 +77,6 @@ class UsesCodesTraitTest extends TestCase
     /** @test */
     public function correct_event_massage_is_provided(): void
     {
-
         $user = createUser();
         $value = 250;
         $code = createCode($value);
